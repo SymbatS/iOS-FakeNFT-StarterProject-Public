@@ -53,8 +53,11 @@ final class TabBarController: UITabBarController {
     private func setupTabBarItems() {
         tabBar.tintColor = .systemBlue
         tabBar.unselectedItemTintColor = .black
+        let networkClient = DefaultNetworkClient()
+        let catalogService = CatalogServiceImpl(client: networkClient)
+        let catalogVC = CatalogViewController(catalogService: catalogService)
+        
         let profileVC = ProfileViewController()
-        let catalogVC = CatalogViewController(servicesAssembly: servicesAssembly)
         let basketVC = BasketViewController()
         let statsVC = StatsViewController()
         

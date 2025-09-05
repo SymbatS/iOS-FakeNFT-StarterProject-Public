@@ -1,10 +1,10 @@
 import Foundation
 
-protocol CatalogService {
+protocol CatalogServiceProtocol {
     func fetchCollections(completion: @escaping (Result<[Category], Error>) -> Void)
 }
 
-final class CatalogServiceImpl: CatalogService {
+final class CatalogServiceImpl: CatalogServiceProtocol {
     private let client: NetworkClient
     init(client: NetworkClient) { self.client = client }
     

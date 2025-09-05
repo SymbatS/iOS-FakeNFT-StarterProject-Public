@@ -51,23 +51,20 @@ final class CatalogCell: UITableViewCell, ReuseIdentifying {
     // MARK: - Public
     func provide(category: Category) {
         categoryNameLabel.text = "\(category.title) (\(category.count))"
-        iconImageView.image = placeholderImage
         
-        currentImageURL = category.image
-        guard let url = currentImageURL else { return }
-        
-        let request = URLRequest(url: url, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: 15)
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, _, _ in
-            guard let self = self else { return }
-            guard self.currentImageURL == url, let data = data, let img = UIImage(data: data) else { return }
-            DispatchQueue.main.async {
-                if self.currentImageURL == url {
-                    self.iconImageView.image = img
-                }
-            }
+        guard let url = category.image else {
+            iconImageView.image = placeholderImage
+            return
         }
-        self.task = task
-        task.resume()
+        
+        iconImageView.kf.setImage(
+            with: url,
+            placeholder: placeholderImage,
+            options: [
+                .transition(.fade(0.2)),
+                .cacheOriginalImage
+            ]
+        )
     }
     
     // MARK: - Layout

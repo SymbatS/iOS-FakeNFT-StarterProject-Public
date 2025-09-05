@@ -3,7 +3,7 @@ import UIKit
 final class CatalogViewController: UIViewController {
     
     // MARK: - UI
-    private let tableView: UITableView = {
+    private lazy var tableView: UITableView = {
         let tv = UITableView(frame: .zero, style: .plain)
         tv.translatesAutoresizingMaskIntoConstraints = false
         tv.separatorStyle = .none
@@ -16,16 +16,19 @@ final class CatalogViewController: UIViewController {
     
     // MARK: - Data
     private var categories: [Category] = []
-    private var sort: SortOption = .byNftCount
+    private var sort: AppPreferences.SortOption = .byNftCount
     
-    let servicesAssembly: ServicesAssembly
+    private let catalogService: CatalogServiceProtocol
     
     // MARK: - Init
-    init(servicesAssembly: ServicesAssembly) {
-        self.servicesAssembly = servicesAssembly
+    init(catalogService: CatalogServiceProtocol) {
+        self.catalogService = catalogService
         super.init(nibName: nil, bundle: nil)
     }
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -87,7 +90,7 @@ final class CatalogViewController: UIViewController {
         activity.startAnimating()
         tableView.backgroundView = nil
         
-        servicesAssembly.catalogService.fetchCollections { [weak self] result in
+        catalogService.fetchCollections { [weak self] result in
             guard let self else { return }
             DispatchQueue.main.async {
                 self.activity.stopAnimating()
@@ -151,32 +154,25 @@ final class CatalogViewController: UIViewController {
         fetchCategories()
     }
     
-    // MARK: - Sorting
-    enum SortOption: String {
-        case byNftCount
-        case byTitle
-    }
-    
     private func applySortAndReload() {
         switch sort {
         case .byNftCount:
             categories.sort { $0.count > $1.count }
         case .byTitle:
             categories.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+        case .default:
+            break
         }
         tableView.reloadData()
         saveSort()
     }
     
     private func saveSort() {
-        UserDefaults.standard.set(sort.rawValue, forKey: "catalog.sort")
+        AppPreferences.shared.catalogSort = sort
     }
     
     private func restoreSort() {
-        if let raw = UserDefaults.standard.string(forKey: "catalog.sort"),
-           let s = SortOption(rawValue: raw) {
-            sort = s
-        }
+        sort = AppPreferences.shared.catalogSort
     }
     
     // MARK: - Actions

@@ -30,11 +30,11 @@
 		3D5AFE582E693E22001250AF /* CatalogCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE562E693E22001250AF /* CatalogCell.swift */; };
 		3D5AFE592E693E22001250AF /* CollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE512E693E22001250AF /* CollectionViewController.swift */; };
 		3D5AFE5A2E693E22001250AF /* CategoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE542E693E22001250AF /* CategoryModels.swift */; };
-		3D5AFE5B2E693E22001250AF /* NftGridCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE4E2E693E22001250AF /* NftGridCell.swift */; };
-		3D5AFE5C2E693E22001250AF /* NFTModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE502E693E22001250AF /* NFTModel.swift */; };
 		3D5AFE5D2E693E22001250AF /* CatalogViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE552E693E22001250AF /* CatalogViewController.swift */; };
 		3D5AFE5E2E693E22001250AF /* CatalogService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE532E693E22001250AF /* CatalogService.swift */; };
 		3D5AFE612E6B7090001250AF /* AppPreferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE602E6B7088001250AF /* AppPreferences.swift */; };
+		3D5AFE652E6EF63A001250AF /* NFTCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE642E6EF63A001250AF /* NFTCollectionViewCell.swift */; };
+		3D5AFE672E731916001250AF /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D5AFE662E731910001250AF /* WebView.swift */; };
 		3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ECE29DB474E00F6D39E /* Colors.swift */; };
 		3F478ED129DB476500F6D39E /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F478ED029DB476500F6D39E /* Fonts.swift */; };
 		3F603CCD29DB4A53000C43D7 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 3F603CCC29DB4A53000C43D7 /* ProgressHUD */; };
@@ -95,9 +95,7 @@
 		3D5AFE442E693DE1001250AF /* BasketViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BasketViewController.swift; sourceTree = "<group>"; };
 		3D5AFE462E693DE1001250AF /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		3D5AFE482E693DE1001250AF /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
-		3D5AFE4E2E693E22001250AF /* NftGridCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NftGridCell.swift; sourceTree = "<group>"; };
 		3D5AFE4F2E693E22001250AF /* CollectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionService.swift; sourceTree = "<group>"; };
-		3D5AFE502E693E22001250AF /* NFTModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTModel.swift; sourceTree = "<group>"; };
 		3D5AFE512E693E22001250AF /* CollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewController.swift; sourceTree = "<group>"; };
 		3D5AFE532E693E22001250AF /* CatalogService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogService.swift; sourceTree = "<group>"; };
 		3D5AFE542E693E22001250AF /* CategoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModels.swift; sourceTree = "<group>"; };
@@ -105,6 +103,8 @@
 		3D5AFE562E693E22001250AF /* CatalogCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogCell.swift; sourceTree = "<group>"; };
 		3D5AFE5F2E69417C001250AF /* catalog.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = catalog.md; sourceTree = "<group>"; };
 		3D5AFE602E6B7088001250AF /* AppPreferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPreferences.swift; sourceTree = "<group>"; };
+		3D5AFE642E6EF63A001250AF /* NFTCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NFTCollectionViewCell.swift; sourceTree = "<group>"; };
+		3D5AFE662E731910001250AF /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		3F478ECE29DB474E00F6D39E /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
 		3F478ED029DB476500F6D39E /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		3F68069329CBBAF100B4F915 /* FakeNFT.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FakeNFT.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -251,10 +251,9 @@
 		3D5AFE522E693E22001250AF /* Collection */ = {
 			isa = PBXGroup;
 			children = (
-				3D5AFE4E2E693E22001250AF /* NftGridCell.swift */,
 				3D5AFE4F2E693E22001250AF /* CollectionService.swift */,
-				3D5AFE502E693E22001250AF /* NFTModel.swift */,
 				3D5AFE512E693E22001250AF /* CollectionViewController.swift */,
+				3D5AFE642E6EF63A001250AF /* NFTCollectionViewCell.swift */,
 			);
 			path = Collection;
 			sourceTree = "<group>";
@@ -324,6 +323,7 @@
 		3F6806C629CBBC4E00B4F915 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				3D5AFE662E731910001250AF /* WebView.swift */,
 				3D5AFE602E6B7088001250AF /* AppPreferences.swift */,
 				3FC8C38F29D245250081F015 /* Requests */,
 				0C79EE6B2A76DE2E00EE90EA /* ServicesAssemly.swift */,
@@ -565,6 +565,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3FC8C38B29D242E90081F015 /* ProductDetailsTableViewCell.swift in Sources */,
+				3D5AFE652E6EF63A001250AF /* NFTCollectionViewCell.swift in Sources */,
 				3F478ECF29DB474E00F6D39E /* Colors.swift in Sources */,
 				0C79EE662A76DDFF00EE90EA /* NftDetailViewController.swift in Sources */,
 				3F478ED129DB476500F6D39E /* Fonts.swift in Sources */,
@@ -590,6 +591,7 @@
 				E19CD5AB2A98B56600CA39A5 /* NftImageCollectionViewCell.swift in Sources */,
 				0CF2C2E12A784C7000FDC837 /* LinePageControl.swift in Sources */,
 				3D5AFE4A2E693DE1001250AF /* StatsViewController.swift in Sources */,
+				3D5AFE672E731916001250AF /* WebView.swift in Sources */,
 				3D5AFE4B2E693DE1001250AF /* TabBarController.swift in Sources */,
 				3D5AFE4C2E693DE1001250AF /* ProfileViewController.swift in Sources */,
 				3D5AFE4D2E693DE1001250AF /* BasketViewController.swift in Sources */,
@@ -599,8 +601,6 @@
 				3D5AFE582E693E22001250AF /* CatalogCell.swift in Sources */,
 				3D5AFE592E693E22001250AF /* CollectionViewController.swift in Sources */,
 				3D5AFE5A2E693E22001250AF /* CategoryModels.swift in Sources */,
-				3D5AFE5B2E693E22001250AF /* NftGridCell.swift in Sources */,
-				3D5AFE5C2E693E22001250AF /* NFTModel.swift in Sources */,
 				3D5AFE5D2E693E22001250AF /* CatalogViewController.swift in Sources */,
 				3D5AFE5E2E693E22001250AF /* CatalogService.swift in Sources */,
 				3F6806D129CBBE6B00B4F915 /* NetworkClient.swift in Sources */,

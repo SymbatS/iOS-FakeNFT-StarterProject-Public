@@ -1,5 +1,9 @@
 import UIKit
 
+protocol ProfileInteractionDelegate: AnyObject {
+    func didEditProfile(_ profile: Profile, completion: ((Profile?) -> Void?))
+    
+}
 
 final class ProfileViewController: UIViewController, LoadingView {
     //MARK: UI
@@ -139,6 +143,10 @@ final class ProfileViewController: UIViewController, LoadingView {
     @objc
     private func editButtonTapped() {
         //todo
+        guard let profile else { return }
+        let editVC = EditProfileViewController(profile: profile)
+        editVC.hidesBottomBarWhenPushed = true 
+        self.navigationController?.pushViewController(editVC, animated: true)
     }
     
 }

@@ -15,8 +15,7 @@ enum ProfileAction: String, CaseIterable {
         }
     }
 
-    func makeViewController(profile: Profile,
-                            servicesAssembly: ServicesAssembly) -> UIViewController? {
+    func makeViewController(profile: Profile, servicesAssembly: ServicesAssembly) -> UIViewController? {
         switch self {
         case .myNFT:
             // TODO: create my nfts vc

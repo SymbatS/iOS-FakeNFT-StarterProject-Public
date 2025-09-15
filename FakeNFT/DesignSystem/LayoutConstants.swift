@@ -26,5 +26,8 @@ enum LayoutConstants {
     static let spacingExtreme: CGFloat = 40
     
     static let rowHeight : CGFloat = 54
+    static let descriptionHeight: CGFloat = 132
+    
+    static let textFieldInset = UIEdgeInsets(top: 11, left: 16, bottom: 11, right: 16)
 }
 

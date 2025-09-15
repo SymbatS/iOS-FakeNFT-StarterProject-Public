@@ -8,3 +8,8 @@
 "Tab.profile" = "Профиль";
 "ViewProfile.MyNFT" = "Мои NFT";
 "ViewProfile.Favorites" = "Избранные NFT";
+
+"Edit.avatar" = "Ссылка на фото";
+"Edit.name" = "Имя";
+"Edit.description" = "Описания";
+"Edit.website" = "Сайт";

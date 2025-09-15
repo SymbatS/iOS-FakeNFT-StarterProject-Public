@@ -222,7 +222,7 @@ extension CatalogViewController: UITableViewDelegate {
         
         let vc = CollectionViewController(category: category, service: nftService)
         vc.hidesBottomBarWhenPushed = true
-
+        
         navigationController?.pushViewController(vc, animated: true)
     }
 }

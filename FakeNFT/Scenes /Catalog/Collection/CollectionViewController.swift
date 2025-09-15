@@ -1,5 +1,6 @@
 import UIKit
 import Kingfisher
+import SafariServices
 
 final class CollectionViewController: UIViewController, UICollectionViewDataSource {
     
@@ -138,6 +139,13 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
             }
         }
     }
+    
+    private func presentWeb(url: URL) {
+        let safariVC = SFSafariViewController(url: url)
+        safariVC.preferredControlTintColor = .black
+        present(safariVC, animated: true)
+    }
+    
     // MARK: - Layout
     private func setupConstraints() {
         view.addSubview(coverImageView)
@@ -161,7 +169,7 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
             authorLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             authorLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
-            descriptionLabel.topAnchor.constraint(equalTo: authorLabel.bottomAnchor),
+            descriptionLabel.topAnchor.constraint(equalTo: authorLabel.bottomAnchor, constant: 5),
             descriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             descriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             
@@ -169,7 +177,7 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
             nftCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             nftCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             nftCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-
+            
             loadingIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             loadingIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
@@ -177,9 +185,7 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
     
     @objc private func authorTapped() {
         guard let url = category?.authorURL else { return }
-        let vc = WebViewController(url: url)
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
+        presentWeb(url: url)
     }
     
     // MARK: UICollectionViewDataSource

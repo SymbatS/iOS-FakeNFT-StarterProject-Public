@@ -1,8 +1,7 @@
 import UIKit
 
 protocol ProfileInteractionDelegate: AnyObject {
-    func didEditProfile(_ profile: Profile, completion: ((Profile?) -> Void?))
-    
+    func didUpdateProfile(with updatedProfile: Profile)
 }
 
 final class ProfileViewController: UIViewController, LoadingView {
@@ -119,33 +118,13 @@ final class ProfileViewController: UIViewController, LoadingView {
         }
     }
     
-    //mock
-    //    private func loadProfile() {
-    //
-    //        let mockProfile = Profile(
-    //            id: "1",
-    //            name: "Test User",
-    //            avatar: "https://.../some-avatar.jpg",
-    //            bio: "Mock bio.",
-    //            website: "https://yandex.ru/legal/practicum_termsofuse/",
-    //            nfts: ["1", "2"],
-    //            likes: ["3", "4"]
-    //        )
-    //
-    //        self.profile = mockProfile
-    //
-    //        // После получения данных вызываем configure
-    //        profileCardView.configure(with: mockProfile)
-    //        tableView.reloadData()
-    //    }
-    
-    
     @objc
     private func editButtonTapped() {
         //todo
         guard let profile else { return }
-        let editVC = EditProfileViewController(profile: profile)
-        editVC.hidesBottomBarWhenPushed = true 
+        let editVC = EditProfileViewController(profile: profile, profileService: profileService)
+        editVC.delegate = self
+        editVC.hidesBottomBarWhenPushed = true
         self.navigationController?.pushViewController(editVC, animated: true)
     }
     
@@ -194,4 +173,14 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         }
     }
     
+}
+
+
+extension ProfileViewController: ProfileInteractionDelegate {
+    func didUpdateProfile(with updatedProfile: Profile) {
+        self.profile = updatedProfile
+        
+        profileCardView.configure(with: updatedProfile)
+        tableView.reloadData()
+    }
 }

@@ -34,6 +34,7 @@ final class CatalogViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        navigationItem.backButtonTitle = ""
         
         setupTable()
         setupNavBar()
@@ -215,8 +216,13 @@ extension CatalogViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 extension CatalogViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
-        let vc = CollectionViewController()
+        let category = categories[indexPath.row]
+        let storage = NftStorageImpl()
+        let nftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: storage)
+        
+        let vc = CollectionViewController(category: category, service: nftService)
+        vc.hidesBottomBarWhenPushed = true
+        
         navigationController?.pushViewController(vc, animated: true)
     }
 }

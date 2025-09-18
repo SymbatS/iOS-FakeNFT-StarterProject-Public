@@ -19,14 +19,8 @@ final class NFTCollectionViewCell: UICollectionViewCell, ReuseIdentifying {
         iv.clipsToBounds = true
         iv.layer.cornerRadius = 12
         iv.translatesAutoresizingMaskIntoConstraints = false
+        iv.kf.indicatorType = .activity
         return iv
-    }()
-    
-    private let spinner: UIActivityIndicatorView = {
-        let sp = UIActivityIndicatorView(style: .medium)
-        sp.hidesWhenStopped = true
-        sp.translatesAutoresizingMaskIntoConstraints = false
-        return sp
     }()
     
     private let likeButton: UIButton = {
@@ -91,9 +85,18 @@ final class NFTCollectionViewCell: UICollectionViewCell, ReuseIdentifying {
         basketButton.addTarget(self, action: #selector(didTapBasket), for: .touchUpInside)
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        nftImageView.kf.cancelDownloadTask()
+        nftImageView.image = nil
+        titleLabel.text = nil
+        priceLabel.text = nil
+        starsStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        nft = nil
+    }
+    
     private func setupLayout() {
         contentView.addSubview(nftImageView)
-        contentView.addSubview(spinner)
         contentView.addSubview(likeButton)
         contentView.addSubview(titleLabel)
         contentView.addSubview(priceLabel)
@@ -105,9 +108,6 @@ final class NFTCollectionViewCell: UICollectionViewCell, ReuseIdentifying {
             nftImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             nftImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             nftImageView.heightAnchor.constraint(equalTo: nftImageView.widthAnchor),
-            
-            spinner.centerXAnchor.constraint(equalTo: nftImageView.centerXAnchor),
-            spinner.centerYAnchor.constraint(equalTo: nftImageView.centerYAnchor),
             
             likeButton.topAnchor.constraint(equalTo: nftImageView.topAnchor, constant: 4),
             likeButton.trailingAnchor.constraint(equalTo: nftImageView.trailingAnchor, constant: -4),
@@ -141,14 +141,10 @@ final class NFTCollectionViewCell: UICollectionViewCell, ReuseIdentifying {
         updateStars(rating: nft.rating)
         
         if let url = nft.imagesUrl.first {
-            spinner.startAnimating()
             nftImageView.kf.setImage(
                 with: url,
                 placeholder: UIImage(systemName: "photo"),
-                options: [.transition(.fade(0.3))],
-                completionHandler: { [weak self] _ in
-                    self?.spinner.stopAnimating()
-                }
+                options: [.transition(.fade(0.3))]
             )
         } else {
             nftImageView.image = UIImage(systemName: "photo")

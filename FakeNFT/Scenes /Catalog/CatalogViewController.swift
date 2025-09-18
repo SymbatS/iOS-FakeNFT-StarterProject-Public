@@ -48,9 +48,19 @@ final class CatalogViewController: UIViewController {
         applySortAndReload()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if categories.isEmpty {
+            tableView.setContentOffset(CGPoint(x: 0, y: -tableView.adjustedContentInset.top), animated: true)
+            refreshControl.beginRefreshing()
+            fetchCategories()
+        }
+    }
+    
     // MARK: - Setup
     private func setupTable() {
         view.addSubview(tableView)
+        tableView.accessibilityIdentifier = "CatalogTable"
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -164,7 +174,10 @@ final class CatalogViewController: UIViewController {
         case .default:
             break
         }
-        tableView.reloadData()
+        
+        UIView.transition(with: tableView, duration: 0.25, options: .transitionCrossDissolve) {
+            self.tableView.reloadData()
+        }
         saveSort()
     }
     
@@ -226,3 +239,13 @@ extension CatalogViewController: UITableViewDelegate {
         navigationController?.pushViewController(vc, animated: true)
     }
 }
+// MARK: - Helpers for tests
+extension CatalogViewController {
+    var exposedTableView: UITableView { tableView }
+}
+
+#if DEBUG
+extension CatalogViewController {
+    var exposedCategories: [Category] { categories }
+}
+#endif

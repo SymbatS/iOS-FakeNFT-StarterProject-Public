@@ -51,7 +51,7 @@ final class CatalogCell: UITableViewCell, ReuseIdentifying {
     // MARK: - Public
     func provide(category: Category) {
         categoryNameLabel.text = "\(category.title) (\(category.count))"
-        
+        accessibilityIdentifier = "CatalogCell_\(category.id)"
         guard let url = category.image else {
             iconImageView.image = placeholderImage
             return

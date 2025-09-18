@@ -6,6 +6,7 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
     
     private var category: Category?
     private var nfts: [Nft] = []
+    
     private let service: NftService
     
     init(category: Category, service: NftService) {
@@ -43,6 +44,7 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
         )
         collectionView.dataSource = self
         collectionView.delegate = self
+        collectionView.accessibilityIdentifier = "NFTCollectionView"
         return collectionView
     }()
     
@@ -119,20 +121,12 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
     
     private func loadNFTs() {
         guard let category else { return }
-        loadingIndicator.startAnimating()
         service.loadNfts(for: category.id) { [weak self] result in
             DispatchQueue.main.async {
-                self?.loadingIndicator.stopAnimating()
                 switch result {
                 case .success(let newNFTs):
-                    guard let self else { return }
-                    let startIndex = self.nfts.count
-                    self.nfts.append(contentsOf: newNFTs)
-                    let indexPaths = (startIndex..<self.nfts.count).map { IndexPath(item: $0, section: 0) }
-                    self.nftCollectionView.performBatchUpdates({
-                        self.nftCollectionView.insertItems(at: indexPaths)
-                    })
-                    print("Загрузили \(self.nfts.count) NFT")
+                    self?.nfts = newNFTs
+                    self?.nftCollectionView.reloadData()
                 case .failure(let error):
                     print("Ошибка загрузки NFT: \(error)")
                 }
@@ -245,3 +239,5 @@ extension CollectionViewController: UICollectionViewDelegate {
         present(detailVC, animated: true)
     }
 }
+
+

@@ -2,6 +2,8 @@ import UIKit
 
 class BottomCartView: UIView{
     
+    weak var delegate: BottomCartViewDelegate?
+    
     var nftCount: Int = 0 {
         didSet {
             countLabel.text = "\(nftCount) NFT"
@@ -58,6 +60,7 @@ class BottomCartView: UIView{
         ])
     }
     @objc private func cartButtonDidTap(){
+        delegate?.didTapCartButton()
         print("cartButtonDidTap")
     }
     

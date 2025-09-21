@@ -9,7 +9,7 @@ class CurrencyBottomView: UIView {
         textView.dataDetectorTypes = []
         let text = "Совершая покупку, вы соглашаетесь с условиями Пользовательского соглашения"
         let attributedString = NSMutableAttributedString(string: text, attributes: [
-            .font: UIFont.bodyRegular,
+            .font: UIFont.caption2,
             .foregroundColor: UIColor.segmentActive
         ])
 

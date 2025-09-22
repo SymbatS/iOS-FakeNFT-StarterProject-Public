@@ -35,25 +35,16 @@ final class NftHandler: LoadingView {
     }
     
     func updateNftIDs(_ newIDs: [String]) {
-        print("🔧 NftHandler.updateNftIDs called")
-        print("📋 Old IDs: \(nftIDs)")
-        print("📋 New IDs: \(newIDs)")
         
-        guard newIDs != nftIDs else {
-            print("⚠️ IDs are the same, skipping")
-            return
-        }
+        guard newIDs != nftIDs else { return }
         
         nftIDs = newIDs
         
         if newIDs.isEmpty {
-            print("📭 New IDs empty, clearing NFTs")
             nfts.removeAll()
             view?.reloadData()
             return
         }
-        
-        print("🔄 Reloading NFTs...")
         reloadNfts()
     }
     
@@ -111,3 +102,26 @@ final class NftHandler: LoadingView {
         return nfts[index]
     }
 }
+
+extension NftHandler {
+    func removeNft(withID id: String) -> Int? {
+        guard let index = nfts.firstIndex(where: { $0.id == id }) else {
+            return nil
+        }
+        
+        nfts.remove(at: index)
+        
+        if let idIndex = nftIDs.firstIndex(of: id) {
+            nftIDs.remove(at: idIndex)
+        }
+        return index
+    }
+    
+    func getNft(withID id: String) -> (nft: Nft, index: Int)? {
+        guard let index = nfts.firstIndex(where: { $0.id == id }) else {
+            return nil
+        }
+        return (nfts[index], index)
+    }
+}
+

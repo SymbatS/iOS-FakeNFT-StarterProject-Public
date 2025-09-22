@@ -188,7 +188,6 @@ extension MyNftViewController: UITableViewDataSource {
             guard let self = self else { return }
             let currentlyLiked = self.delegate?.isNftLiked(nft.id) ?? false
             
-            // ИСПРАВЛЕНО: убираем guard let для getCurrentLikes()
             guard let delegate = self.delegate else { return }
             let currentLikes = delegate.getCurrentLikes()
             
@@ -201,10 +200,8 @@ extension MyNftViewController: UITableViewDataSource {
                 }
             }
             
-            // Обновляем через делегат
             delegate.didUpdateLikes(newLikes) { [weak self] _ in
                 guard let self = self else { return }
-                // Обновляем только эту ячейку
                 if let visibleIndexPaths = self.tableView.indexPathsForVisibleRows,
                    visibleIndexPaths.contains(indexPath) {
                     self.tableView.reloadRows(at: [indexPath], with: .none)

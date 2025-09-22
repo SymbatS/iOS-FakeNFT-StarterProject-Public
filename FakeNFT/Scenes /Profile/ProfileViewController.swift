@@ -177,12 +177,10 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         
         if let viewControllerToPresent = action.makeViewController(profile: profile, servicesAssembly: servicesAssembly) {
             if let favNftVC = viewControllerToPresent as? FavoritesNftViewController {
-                print("🔗 Setting delegate for FavoritesNftViewController")
 
                 favNftVC.delegate = self
             }
             if let myNftVC = viewControllerToPresent as? MyNftViewController {
-                print("🔗 Setting delegate for MyNftViewController")
 
                 myNftVC.delegate = self
             }
@@ -196,15 +194,12 @@ extension ProfileViewController: ProfileInteractionDelegate {
     
     func getCurrentLikes() -> [String] {
         let likes = profile?.likes ?? []
-        print("📋 getCurrentLikes: \(likes)")
         return likes
     }
     
     func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?) {
-        print("🔄 didUpdateLikes called with: \(likes)")
         
         let previousLikes = profile?.likes ?? []
-        print("📝 Previous likes: \(previousLikes)")
         
         profile?.likes = Array(Set(likes))
         
@@ -213,7 +208,6 @@ extension ProfileViewController: ProfileInteractionDelegate {
         
         notifyChildControllers(with: profile!)
         
-        print("🌐 Sending updateProfile request with likes: \(likes)")
         
         profileService.updateProfile(
             name: nil,
@@ -226,7 +220,6 @@ extension ProfileViewController: ProfileInteractionDelegate {
                 guard let self = self else { return }
                 switch result {
                 case .success(let updatedProfile):
-                    print("✅ Profile updated successfully. New likes: \(updatedProfile.likes)")
                     self.profile = updatedProfile
                     self.profileCardView.configure(with: updatedProfile)
                     self.tableView.reloadData()
@@ -234,8 +227,6 @@ extension ProfileViewController: ProfileInteractionDelegate {
                     completion?(updatedProfile)
                     
                 case .failure(let error):
-                    print("❌ Failed to update likes: \(error)")
-                    // Откат при ошибке
                     self.profile?.likes = previousLikes
                     self.profileCardView.configure(with: self.profile!)
                     self.tableView.reloadData()
@@ -247,18 +238,12 @@ extension ProfileViewController: ProfileInteractionDelegate {
     }
     
     private func notifyChildControllers(with profile: Profile) {
-        print("🔔 Notifying child controllers. Profile likes: \(profile.likes)")
         
-        guard let navController = navigationController else {
-            print("❌ Navigation controller is nil")
-            return
-        }
+        guard let navController = navigationController else { return }
         
         for viewController in navController.viewControllers {
-            print("🔍 Checking controller: \(type(of: viewController))")
             
             if let favoritesVC = viewController as? FavoritesNftViewController {
-                print("📱 Found FavoritesNftViewController, updating with likes: \(profile.likes)")
                 favoritesVC.updateNftIDs(profile.likes)
             }
         }
@@ -266,12 +251,10 @@ extension ProfileViewController: ProfileInteractionDelegate {
     
     func isNftLiked(_ nftID: String) -> Bool {
         let isLiked = profile?.likes.contains(nftID) ?? false
-        print("💖 isNftLiked(\(nftID)): \(isLiked)")
         return isLiked
     }
     
     func didUpdateProfile(with updatedProfile: Profile) {
-        print("👤 didUpdateProfile called")
         self.profile = updatedProfile
         profileCardView.configure(with: updatedProfile)
         tableView.reloadData()

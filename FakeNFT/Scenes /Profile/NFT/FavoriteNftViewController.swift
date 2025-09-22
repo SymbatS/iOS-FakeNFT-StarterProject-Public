@@ -96,8 +96,6 @@ final class FavoritesNftViewController: UIViewController {
     }
     
     func updateNftIDs(_ newIDs: [String]) {
-        print("🔄 FavoritesNftViewController.updateNftIDs called with: \(newIDs)")
-        print("📋 Previous nftIDs: \(self.nftIDs)")
         
         self.nftIDs = newIDs
         handler.updateNftIDs(newIDs)
@@ -106,17 +104,16 @@ final class FavoritesNftViewController: UIViewController {
             guard let self = self else { return }
             
             if newIDs.isEmpty {
-                print("📭 Showing empty label")
                 self.showEmptyLabel()
             } else {
-                print("📋 Showing collection view with \(newIDs.count) items")
                 self.emptyLabel.isHidden = true
                 self.collectionView.isHidden = false
+                self.collectionView.alpha = 1
                 self.collectionView.reloadData()
             }
         }
     }
-    
+        
     private func showEmptyLabel() {
         emptyLabel.isHidden = false
         collectionView.isHidden = true
@@ -140,47 +137,57 @@ final class FavoritesNftViewController: UIViewController {
         
         var updatedLikes = currentLikes
         updatedLikes.removeAll { $0 == id }
+                
+        animatedRemoveNft(withID: id)
         
-        print("🗑️ Removing like for ID: \(id)")
-        print("📝 Current likes: \(currentLikes)")
-        print("📝 Updated likes: \(updatedLikes)")
-        
-        // ✅ НЕ обновляем UI сразу, ждем ответа сервера
         delegate.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
             guard let self = self else { return }
             
             DispatchQueue.main.async {
                 if let profile = updatedProfile {
-                    print("✅ Server confirmed. Final likes: \(profile.likes)")
-                    self.updateNftIDs(profile.likes)
+                    if profile.likes != updatedLikes {
+                        self.updateNftIDs(profile.likes)
+                    }
                 } else {
-                    print("❌ Server failed. Reverting to: \(currentLikes)")
-                    // При ошибке возвращаем старое состояние
                     self.updateNftIDs(currentLikes)
                 }
             }
         }
     }
-
     
-//    private func removeLike(withID id: String) {
-//        guard let delegate = delegate else { return }
-//        let currentLikes = delegate.getCurrentLikes()
-//        
-//        var updatedLikes = currentLikes
-//        updatedLikes.removeAll { $0 == id }
-//        
-//        updateNftIDs(updatedLikes)
-//        
-//        delegate.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
-//            guard let self = self else { return }
-//            
-//            let finalLikes = updatedProfile?.likes ?? currentLikes
-//            if finalLikes != updatedLikes {
-//                self.updateNftIDs(finalLikes)
-//            }
-//        }
-//    }
+    private func animatedRemoveNft(withID id: String) {
+        guard let removedIndex = handler.removeNft(withID: id) else {
+            return
+        }
+        
+        
+        collectionView.performBatchUpdates({
+            let indexPath = IndexPath(item: removedIndex, section: 0)
+            collectionView.deleteItems(at: [indexPath])
+        }) { [weak self] finished in
+            guard let self = self, finished else { return }
+            
+            if self.handler.numberOfItems == 0 {
+                self.showEmptyLabelAnimated()
+            }
+        }
+    }
+
+    private func showEmptyLabelAnimated() {
+        UIView.animate(withDuration: 0.3, animations: {
+            self.collectionView.alpha = 0
+        }) { _ in
+            self.collectionView.isHidden = true
+            self.emptyLabel.isHidden = false
+            self.emptyLabel.alpha = 0
+            
+            UIView.animate(withDuration: 0.3) {
+                self.emptyLabel.alpha = 1
+                self.collectionView.alpha = 1
+            }
+        }
+    }
+    
     
     @objc private func backButtonTapped() {
         if navigationController?.viewControllers.first == self {

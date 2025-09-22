@@ -9,7 +9,7 @@ struct ProfilePutDto: Dto, MultiValueFormDataDto {
     let description: String?
     let website: String?
     let likes: [String]?
-
+    
     func asDictionary() -> [String: String] {
         var dict: [String: String] = [:]
         if let name, !name.isEmpty { dict["name"] = name }
@@ -17,18 +17,21 @@ struct ProfilePutDto: Dto, MultiValueFormDataDto {
         if let description, !description.isEmpty { dict["description"] = description }
         if let website, !website.isEmpty { dict["website"] = website }
         
-        
-        // ✅ Формат: likes = "id1,id2,id3"
-        if let likes, !likes.isEmpty {
-            dict["likes"] = likes.joined(separator: ",")
-            print("📝 Added likes as comma-separated: \(likes.joined(separator: ","))")
+        if let likes {
+            if likes.isEmpty {
+                
+                dict["likes"] = "null"
+                
+            } else {
+                dict["likes"] = likes.joined(separator: ",")
+            }
         } else {
-            dict["likes"] = ""
-            print("📝 Added empty likes string")
+            print("📝 No likes provided - not adding to dict")
         }
+        
         return dict
     }
-
+    
     func asFormURLEncodedPairs() -> [(String, String)] {
         print("🔗 asFormURLEncodedPairs called")
         guard let likes else {
@@ -37,8 +40,8 @@ struct ProfilePutDto: Dto, MultiValueFormDataDto {
         }
         
         if likes.isEmpty {
-            print("📝 Empty likes array, sending null")
-            return [("likes", "null")]
+            print("📝 Empty likes array, sending empty array")
+            return []
         }
         
         let pairs = likes.map { ("likes", $0) }
@@ -46,3 +49,5 @@ struct ProfilePutDto: Dto, MultiValueFormDataDto {
         return pairs
     }
 }
+
+

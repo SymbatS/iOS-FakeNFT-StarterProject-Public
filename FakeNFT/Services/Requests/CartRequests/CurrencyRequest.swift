@@ -8,3 +8,4 @@ struct CurrencyRequest: NetworkRequest {
     }
     var httpMethod: HttpMethod { .get }
 }
+

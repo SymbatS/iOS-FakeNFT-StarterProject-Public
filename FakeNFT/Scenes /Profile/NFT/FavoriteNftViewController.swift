@@ -141,17 +141,46 @@ final class FavoritesNftViewController: UIViewController {
         var updatedLikes = currentLikes
         updatedLikes.removeAll { $0 == id }
         
-        updateNftIDs(updatedLikes)
+        print("🗑️ Removing like for ID: \(id)")
+        print("📝 Current likes: \(currentLikes)")
+        print("📝 Updated likes: \(updatedLikes)")
         
+        // ✅ НЕ обновляем UI сразу, ждем ответа сервера
         delegate.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
             guard let self = self else { return }
             
-            let finalLikes = updatedProfile?.likes ?? currentLikes
-            if finalLikes != updatedLikes {
-                self.updateNftIDs(finalLikes)
+            DispatchQueue.main.async {
+                if let profile = updatedProfile {
+                    print("✅ Server confirmed. Final likes: \(profile.likes)")
+                    self.updateNftIDs(profile.likes)
+                } else {
+                    print("❌ Server failed. Reverting to: \(currentLikes)")
+                    // При ошибке возвращаем старое состояние
+                    self.updateNftIDs(currentLikes)
+                }
             }
         }
     }
+
+    
+//    private func removeLike(withID id: String) {
+//        guard let delegate = delegate else { return }
+//        let currentLikes = delegate.getCurrentLikes()
+//        
+//        var updatedLikes = currentLikes
+//        updatedLikes.removeAll { $0 == id }
+//        
+//        updateNftIDs(updatedLikes)
+//        
+//        delegate.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
+//            guard let self = self else { return }
+//            
+//            let finalLikes = updatedProfile?.likes ?? currentLikes
+//            if finalLikes != updatedLikes {
+//                self.updateNftIDs(finalLikes)
+//            }
+//        }
+//    }
     
     @objc private func backButtonTapped() {
         if navigationController?.viewControllers.first == self {

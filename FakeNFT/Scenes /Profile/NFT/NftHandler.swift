@@ -35,8 +35,25 @@ final class NftHandler: LoadingView {
     }
     
     func updateNftIDs(_ newIDs: [String]) {
-        guard newIDs != nftIDs else { return }
+        print("🔧 NftHandler.updateNftIDs called")
+        print("📋 Old IDs: \(nftIDs)")
+        print("📋 New IDs: \(newIDs)")
+        
+        guard newIDs != nftIDs else {
+            print("⚠️ IDs are the same, skipping")
+            return
+        }
+        
         nftIDs = newIDs
+        
+        if newIDs.isEmpty {
+            print("📭 New IDs empty, clearing NFTs")
+            nfts.removeAll()
+            view?.reloadData()
+            return
+        }
+        
+        print("🔄 Reloading NFTs...")
         reloadNfts()
     }
     

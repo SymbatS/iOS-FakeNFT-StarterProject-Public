@@ -21,24 +21,15 @@ final class NftTableViewCell: UITableViewCell {
         let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.backgroundColor = .clear
-
-        let imageView = UIImageView(image: UIImage(named: "heart_pressed"))
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .center
+        
+        button.setImage(UIImage(named: "heart"), for: .normal)
+//        button.imageView?.contentMode = .scaleAspectFit
         
         button.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
         
-        button.addSubview(imageView)
-
-        NSLayoutConstraint.activate([
-            imageView.centerXAnchor.constraint(equalTo: button.centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: button.centerYAnchor),
-            imageView.widthAnchor.constraint(equalToConstant: 21),
-            imageView.heightAnchor.constraint(equalToConstant: 18)
-        ])
-
         return button
     }()
+
     
     private lazy var nameLabel: UILabel = {
         let label = UILabel()
@@ -118,6 +109,8 @@ final class NftTableViewCell: UITableViewCell {
         
         contentView.addSubview(textStack)
         contentView.addSubview(priceStack)
+        contentView.isUserInteractionEnabled = true
+        nftImageView.isUserInteractionEnabled = true
 
         NSLayoutConstraint.activate([
             nftImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: LayoutConstants.horizontalPadding),
@@ -142,41 +135,12 @@ final class NftTableViewCell: UITableViewCell {
 
     // MARK: - Configuration
 
-//    func configure(with nft: Nft, delegate: ProfileInteractionDelegate?) {
-//        nameLabel.text = nft.title
-//        let authrorText = "\(NSLocalizedString("MyNftViewController.by", comment: "")) \(nft.title)"
-//        authorLabel.attributedText = .withLetterSpacing(authrorText)
-//
-//        price.text = String(format: "%.2f ETH", nft.price)
-//
-//        if let firstImageURL = nft.imagesUrl.first {
-//            nftImageView.kf.setImage(with: firstImageURL)
-//        }
-//
-//        let isLiked = delegate?.isNftLiked(nft.id) ?? false
-//        likeButton.setImage(UIImage(named: isLiked ? "heart_pressed" : "heart"), for: .normal)
-//
-//        ratingView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-//
-//        (1...5).forEach { index in
-//            let isActive = index <= Int(nft.rating)
-//            let image = UIImage(named: isActive ? "stars_active" : "stars_no_active")
-//
-//            let starImageView = UIImageView(image: image)
-//            starImageView.contentMode = .scaleAspectFit
-//            starImageView.tintColor = isActive ? .segmentInactive : nil
-//
-//            ratingView.addArrangedSubview(starImageView)
-//        }
-//    }
-    
-    // In NftTableViewCell.swift - update the configure method
 
     func configure(with nft: Nft, delegate: ProfileInteractionDelegate?) {
         self.delegate = delegate
         
         nameLabel.text = nft.title
-        let authorText = "\(NSLocalizedString("MyNftViewController.by", comment: "")) \(nft.author)" // Fix: use nft.author, not nft.title
+        let authorText = "\(NSLocalizedString("MyNftViewController.by", comment: "")) \(nft.author)"
         authorLabel.attributedText = .withLetterSpacing(authorText)
         
         price.text = String(format: "%.2f ETH", nft.price)
@@ -201,11 +165,8 @@ final class NftTableViewCell: UITableViewCell {
         }
     }
     
-//    private func isLiked(){
-//        let isLiked =
-//    }
-    
     @objc func likeTapped() {
+        print("mynft like tapped")
         onLikeTapped?()
     }
 }

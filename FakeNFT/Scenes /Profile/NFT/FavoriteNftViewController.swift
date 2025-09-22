@@ -4,7 +4,7 @@ final class FavoritesNftViewController: UIViewController {
     weak var delegate: ProfileInteractionDelegate?
     
     private let servicesAssembly: ServicesAssembly
-    private let nftIDs: [String]
+    private var nftIDs: [String]
     
     private lazy var handler: NftHandler = {
         NftHandler(
@@ -95,6 +95,41 @@ final class FavoritesNftViewController: UIViewController {
         ])
     }
     
+    func updateNftIDs(_ newIDs: [String]) {
+        print("🔄 FavoritesNftViewController.updateNftIDs called with: \(newIDs)")
+        print("📋 Previous nftIDs: \(self.nftIDs)")
+        
+        self.nftIDs = newIDs
+        handler.updateNftIDs(newIDs)
+        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            
+            if newIDs.isEmpty {
+                print("📭 Showing empty label")
+                self.showEmptyLabel()
+            } else {
+                print("📋 Showing collection view with \(newIDs.count) items")
+                self.emptyLabel.isHidden = true
+                self.collectionView.isHidden = false
+                self.collectionView.reloadData()
+            }
+        }
+    }
+
+    
+//    func updateNftIDs(_ newIDs: [String]) {
+//            self.nftIDs = newIDs
+//            handler.updateNftIDs(newIDs)
+//            
+//            if newIDs.isEmpty {
+//                showEmptyLabel()
+//            } else {
+//                emptyLabel.isHidden = true
+//                collectionView.isHidden = false
+//            }
+//        }
+    
     private func showEmptyLabel() {
         emptyLabel.isHidden = false
         collectionView.isHidden = true
@@ -113,21 +148,43 @@ final class FavoritesNftViewController: UIViewController {
     }
     
     private func removeLike(withID id: String) {
-        var updatedLikes = handler.nftIDs
-        guard let index = updatedLikes.firstIndex(of: id) else { return }
-        updatedLikes.remove(at: index)
+        // ИСПРАВЛЕНО: убираем guard let для getCurrentLikes()
+        guard let delegate = delegate else { return }
+        let currentLikes = delegate.getCurrentLikes()
         
-        delegate?.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
+        var updatedLikes = currentLikes
+        updatedLikes.removeAll { $0 == id }
+        
+        // Оптимистично обновляем UI
+        updateNftIDs(updatedLikes)
+        
+        delegate.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
             guard let self = self else { return }
             
-            let newLikes = updatedProfile?.likes ?? updatedLikes
-            self.handler.updateNftIDs(newLikes)
-            
-            if newLikes.isEmpty {
-                self.showEmptyLabel()
+            // Если обновление не удалось, возвращаем предыдущее состояние
+            let finalLikes = updatedProfile?.likes ?? currentLikes
+            if finalLikes != updatedLikes {
+                self.updateNftIDs(finalLikes)
             }
         }
     }
+    
+//    private func removeLike(withID id: String) {
+//        var updatedLikes = handler.nftIDs
+//        guard let index = updatedLikes.firstIndex(of: id) else { return }
+//        updatedLikes.remove(at: index)
+//        
+//        delegate?.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
+//            guard let self = self else { return }
+//            
+//            let newLikes = updatedProfile?.likes ?? updatedLikes
+//            self.handler.updateNftIDs(newLikes)
+//            
+//            if newLikes.isEmpty {
+//                self.showEmptyLabel()
+//            }
+//        }
+//    }
     
     @objc private func backButtonTapped() {
         if navigationController?.viewControllers.first == self {

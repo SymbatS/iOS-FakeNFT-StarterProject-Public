@@ -8,3 +8,18 @@
 "Tab.profile" = "Профиль";
 "ViewProfile.MyNFT" = "Мои NFT";
 "ViewProfile.Favorites" = "Избранные NFT";
+
+"Edit.avatar" = "Ссылка на фото";
+"Edit.name" = "Имя";
+"Edit.description" = "Описания";
+"Edit.website" = "Сайт";
+"Edit.save" = "Сохранить";
+"Edit.changePhotoAction" = "Изменить фото";
+"Edit.deletePhotoAction" = "Удалить фото";
+"Edit.photoLink" = "Ссылка на фото";
+"Edit.changePhotoTitle" = "Фото профиля";
+
+
+"Common.save" = "Сохранить";
+"Common.cancel" = "Отменить";
+

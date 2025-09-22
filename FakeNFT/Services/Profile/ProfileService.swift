@@ -2,20 +2,22 @@ import Foundation
 
 protocol ProfileServiceProtocol {
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void)
+    func updateProfile(with profile: Profile, completion: @escaping (Result<Void, Error>) -> Void)
+    
 }
 
 final class ProfileService: ProfileServiceProtocol {
     private let networkClient: NetworkClient
     private let profileId: String
-
+    
     init(networkClient: NetworkClient, profileId: String) {
         self.networkClient = networkClient
         self.profileId = profileId
     }
-
+    
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
         let request = ProfileRequest(profileId: self.profileId)
-
+        
         networkClient.send(request: request, type: Profile.self) { [weak self] result in
             DispatchQueue.main.async {
                 guard let self = self else { return }
@@ -30,7 +32,22 @@ final class ProfileService: ProfileServiceProtocol {
             }
         }
     }
+    
+    func updateProfile(with profile: Profile, completion: @escaping (Result<Void, Error>) -> Void) {
+        let request = ProfilePutRequest(profile: profile)
 
+        networkClient.send(request: request) { result in
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    completion(.success(()))
+                case .failure(let error):
+                    completion(.failure(error))
+                }
+            }
+        }
+    }
+    
     private func normalizedProfile(_ profile: Profile) -> Profile {
         let updatedAvatar = profile.avatar.replacingOccurrences(
             of: "https://cloudflare-ipfs.com/ipfs/",

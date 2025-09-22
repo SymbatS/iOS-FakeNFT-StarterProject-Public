@@ -198,16 +198,12 @@ extension ProfileViewController: ProfileInteractionDelegate {
     }
     
     func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?) {
-        
         let previousLikes = profile?.likes ?? []
         
         profile?.likes = Array(Set(likes))
         
         profileCardView.configure(with: profile!)
         tableView.reloadData()
-        
-        notifyChildControllers(with: profile!)
-        
         
         profileService.updateProfile(
             name: nil,
@@ -220,9 +216,11 @@ extension ProfileViewController: ProfileInteractionDelegate {
                 guard let self = self else { return }
                 switch result {
                 case .success(let updatedProfile):
+                    print("✅ Server success: \(updatedProfile.likes)")
                     self.profile = updatedProfile
                     self.profileCardView.configure(with: updatedProfile)
                     self.tableView.reloadData()
+                    
                     self.notifyChildControllers(with: updatedProfile)
                     completion?(updatedProfile)
                     
@@ -230,6 +228,7 @@ extension ProfileViewController: ProfileInteractionDelegate {
                     self.profile?.likes = previousLikes
                     self.profileCardView.configure(with: self.profile!)
                     self.tableView.reloadData()
+                    
                     self.notifyChildControllers(with: self.profile!)
                     completion?(nil)
                 }
@@ -238,12 +237,13 @@ extension ProfileViewController: ProfileInteractionDelegate {
     }
     
     private func notifyChildControllers(with profile: Profile) {
+        print("🔔 Notifying controllers with likes: \(profile.likes)")
         
         guard let navController = navigationController else { return }
         
         for viewController in navController.viewControllers {
-            
             if let favoritesVC = viewController as? FavoritesNftViewController {
+                print("📱 Updating FavoritesVC with: \(profile.likes)")
                 favoritesVC.updateNftIDs(profile.likes)
             }
         }
@@ -261,4 +261,3 @@ extension ProfileViewController: ProfileInteractionDelegate {
         notifyChildControllers(with: updatedProfile)
     }
 }
-

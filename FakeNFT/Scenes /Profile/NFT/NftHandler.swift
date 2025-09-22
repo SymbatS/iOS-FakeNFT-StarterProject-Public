@@ -114,6 +114,7 @@ extension NftHandler {
         if let idIndex = nftIDs.firstIndex(of: id) {
             nftIDs.remove(at: idIndex)
         }
+        
         return index
     }
     

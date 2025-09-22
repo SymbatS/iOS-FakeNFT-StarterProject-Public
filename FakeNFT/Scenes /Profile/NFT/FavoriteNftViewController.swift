@@ -96,6 +96,9 @@ final class FavoritesNftViewController: UIViewController {
     }
     
     func updateNftIDs(_ newIDs: [String]) {
+        guard newIDs != self.nftIDs else {
+            return
+        }
         
         self.nftIDs = newIDs
         handler.updateNftIDs(newIDs)
@@ -113,7 +116,7 @@ final class FavoritesNftViewController: UIViewController {
             }
         }
     }
-        
+    
     private func showEmptyLabel() {
         emptyLabel.isHidden = false
         collectionView.isHidden = true
@@ -137,7 +140,7 @@ final class FavoritesNftViewController: UIViewController {
         
         var updatedLikes = currentLikes
         updatedLikes.removeAll { $0 == id }
-                
+        
         animatedRemoveNft(withID: id)
         
         delegate.didUpdateLikes(updatedLikes) { [weak self] updatedProfile in
@@ -145,7 +148,8 @@ final class FavoritesNftViewController: UIViewController {
             
             DispatchQueue.main.async {
                 if let profile = updatedProfile {
-                    if profile.likes != updatedLikes {
+                    
+                    if Set(profile.likes) != Set(updatedLikes) {
                         self.updateNftIDs(profile.likes)
                     }
                 } else {
@@ -172,7 +176,7 @@ final class FavoritesNftViewController: UIViewController {
             }
         }
     }
-
+    
     private func showEmptyLabelAnimated() {
         UIView.animate(withDuration: 0.3, animations: {
             self.collectionView.alpha = 0

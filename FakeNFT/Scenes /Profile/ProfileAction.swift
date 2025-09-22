@@ -10,20 +10,28 @@ enum ProfileAction: String, CaseIterable {
 
     func count(from profile: Profile) -> Int? {
         switch self {
-        case .myNFT: return profile.nfts.count
-        case .favoriteNFT: return profile.likes.count
+        case .myNFT:
+            return profile.nfts.count
+        case .favoriteNFT:
+            return profile.likes.count
         }
     }
 
     func makeViewController(profile: Profile, servicesAssembly: ServicesAssembly) -> UIViewController? {
         switch self {
         case .myNFT:
-            // TODO: create my nfts vc
-            let vc = MyNftViewController(/*servicesAssembly: servicesAssembly, nftIDs: profile.nfts*/)
+            let vc = MyNftViewController(
+                servicesAssembly: servicesAssembly,
+                nftIDs: profile.nfts,
+                profile: profile
+            )
+            vc.hidesBottomBarWhenPushed = true
             return vc
         case .favoriteNFT:
             // TODO: create favs vc
-            let vc = FavoriteNftViewController(/*servicesAssembly: servicesAssembly, nftIDs: profile.likes*/)
+            let vc = FavoritesNftViewController(servicesAssembly: servicesAssembly, nftIDs: profile.likes)
+            vc.hidesBottomBarWhenPushed = true
+
             return vc
         }
     }

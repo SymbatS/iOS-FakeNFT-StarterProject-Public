@@ -2,6 +2,8 @@ import UIKit
 
 protocol ProfileInteractionDelegate: AnyObject {
     func didUpdateProfile(with updatedProfile: Profile)
+    func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?)
+    func isNftLiked(_ nftID: String) -> Bool
 }
 
 final class ProfileViewController: UIViewController, LoadingView {
@@ -89,6 +91,9 @@ final class ProfileViewController: UIViewController, LoadingView {
         button.tintColor = .label
         button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         let barButtonItem = UIBarButtonItem(customView: button)
+        
+        
+        
         navigationItem.rightBarButtonItem = barButtonItem
     }
     
@@ -103,13 +108,14 @@ final class ProfileViewController: UIViewController, LoadingView {
                 guard let self = self else { return }
                 switch result {
                 case .success(let profile):
-                    self.hideLoading() // Используем метод протокола
+                    self.hideLoading() 
                     self.profileCardView.isHidden = false
                     self.tableView.isHidden = false
                     
                     self.profile = profile
                     self.profileCardView.configure(with: profile)
                     self.tableView.reloadData()
+                    print("success fetching profile")
                 case .failure(let error):
                     //TODO: Show alert to user
                     print("Error fetching profile: \(error)")
@@ -129,6 +135,7 @@ final class ProfileViewController: UIViewController, LoadingView {
     }
     
 }
+
 //MARK: TableView methods
 extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -169,6 +176,12 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         guard let profile = self.profile else { return }
         
         if let viewControllerToPresent = action.makeViewController(profile: profile, servicesAssembly: servicesAssembly) {
+            if let favNftVC = viewControllerToPresent as? FavoritesNftViewController {
+                favNftVC.delegate = self
+            }
+            if let myNftVC = viewControllerToPresent as? MyNftViewController {
+                myNftVC.delegate = self
+            }
             self.navigationController?.pushViewController(viewControllerToPresent, animated: true)
         }
     }
@@ -177,6 +190,45 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
 
 
 extension ProfileViewController: ProfileInteractionDelegate {
+    func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?) {
+            let previousLikes = profile?.likes ?? []
+            profile?.likes = Array(Set(likes)) // optimistic update + dedupe
+            
+            // Update UI immediately
+            profileCardView.configure(with: profile!)
+            tableView.reloadData()
+            
+            profileService.updateProfile(
+                name: nil,
+                avatar: nil,
+                description: nil,
+                website: nil,
+                likes: likes
+            ) { [weak self] result in
+                DispatchQueue.main.async {
+                    guard let self = self else { return }
+                    switch result {
+                    case .success(let updatedProfile):
+                        self.profile = updatedProfile
+                        self.profileCardView.configure(with: updatedProfile)
+                        self.tableView.reloadData()
+                        completion?(updatedProfile)
+                        
+                    case .failure:
+                        // Revert on failure
+                        self.profile?.likes = previousLikes
+                        self.profileCardView.configure(with: self.profile!)
+                        self.tableView.reloadData()
+                        completion?(nil)
+                    }
+                }
+            }
+        }
+    
+    func isNftLiked(_ nftID: String) -> Bool {
+        profile?.likes.contains(nftID) ?? false
+    }
+    
     func didUpdateProfile(with updatedProfile: Profile) {
         self.profile = updatedProfile
         

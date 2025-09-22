@@ -47,7 +47,8 @@ final class NftDetailPresenterImpl: NftDetailPresenter {
             loadNft()
         case .data(let nft):
             view?.hideLoading()
-            let cellModels = nft.images.map { NftDetailCellModel(url: $0) }
+            // Исправление: используем imagesUrl вместо images
+            let cellModels = nft.imagesUrl.map { NftDetailCellModel(url: $0) }
             view?.displayCells(cellModels)
         case .failed(let error):
             let errorModel = makeErrorModel(error)
@@ -58,11 +59,13 @@ final class NftDetailPresenterImpl: NftDetailPresenter {
 
     private func loadNft() {
         service.loadNft(id: input.id) { [weak self] result in
-            switch result {
-            case .success(let nft):
-                self?.state = .data(nft)
-            case .failure(let error):
-                self?.state = .failed(error)
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let nft):
+                    self?.state = .data(nft.toDomain())
+                case .failure(let error):
+                    self?.state = .failed(error)
+                }
             }
         }
     }

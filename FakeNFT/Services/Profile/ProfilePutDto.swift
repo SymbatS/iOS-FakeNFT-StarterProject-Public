@@ -1,4 +1,8 @@
-struct ProfilePutDto: Dto/*, MultiValueFormDataDto*/ {
+protocol MultiValueFormDataDto {
+    func asFormURLEncodedPairs() -> [(String, String)]
+}
+
+struct ProfilePutDto: Dto, MultiValueFormDataDto {
     let name: String?
     let avatar: String?
     let description: String?
@@ -16,11 +20,9 @@ struct ProfilePutDto: Dto/*, MultiValueFormDataDto*/ {
 
     func asFormURLEncodedPairs() -> [(String, String)] {
         guard let likes else { return [] }
-
         if likes.isEmpty {
             return [("likes", "null")]
         }
-
         return likes.map { ("likes", $0) }
     }
 }

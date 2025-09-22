@@ -1,3 +1,4 @@
+import Foundation
 protocol MultiValueFormDataDto {
     func asFormURLEncodedPairs() -> [(String, String)]
 }
@@ -15,14 +16,33 @@ struct ProfilePutDto: Dto, MultiValueFormDataDto {
         if let avatar, !avatar.isEmpty { dict["avatar"] = avatar }
         if let description, !description.isEmpty { dict["description"] = description }
         if let website, !website.isEmpty { dict["website"] = website }
+        
+        
+        // ✅ Формат: likes = "id1,id2,id3"
+        if let likes, !likes.isEmpty {
+            dict["likes"] = likes.joined(separator: ",")
+            print("📝 Added likes as comma-separated: \(likes.joined(separator: ","))")
+        } else {
+            dict["likes"] = ""
+            print("📝 Added empty likes string")
+        }
         return dict
     }
 
     func asFormURLEncodedPairs() -> [(String, String)] {
-        guard let likes else { return [] }
+        print("🔗 asFormURLEncodedPairs called")
+        guard let likes else {
+            print("📝 No likes provided, returning empty")
+            return []
+        }
+        
         if likes.isEmpty {
+            print("📝 Empty likes array, sending null")
             return [("likes", "null")]
         }
-        return likes.map { ("likes", $0) }
+        
+        let pairs = likes.map { ("likes", $0) }
+        print("📝 Form data pairs for likes: \(pairs)")
+        return pairs
     }
 }

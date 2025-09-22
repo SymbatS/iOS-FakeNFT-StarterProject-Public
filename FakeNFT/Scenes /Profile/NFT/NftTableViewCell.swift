@@ -23,8 +23,6 @@ final class NftTableViewCell: UITableViewCell {
         button.backgroundColor = .clear
         
         button.setImage(UIImage(named: "heart"), for: .normal)
-//        button.imageView?.contentMode = .scaleAspectFit
-        
         button.addTarget(self, action: #selector(likeTapped), for: .touchUpInside)
         
         return button
@@ -135,7 +133,6 @@ final class NftTableViewCell: UITableViewCell {
 
     // MARK: - Configuration
 
-
     func configure(with nft: Nft, delegate: ProfileInteractionDelegate?) {
         self.delegate = delegate
         
@@ -149,11 +146,9 @@ final class NftTableViewCell: UITableViewCell {
             nftImageView.kf.setImage(with: firstImageURL)
         }
         
-        // Set heart state based on current likes
         let isLiked = delegate?.isNftLiked(nft.id) ?? false
         likeButton.setImage(UIImage(named: isLiked ? "heart_pressed" : "heart"), for: .normal)
         
-        // Rating stars setup (keep existing code)
         ratingView.arrangedSubviews.forEach { $0.removeFromSuperview() }
         (1...5).forEach { index in
             let isActive = index <= Int(nft.rating)

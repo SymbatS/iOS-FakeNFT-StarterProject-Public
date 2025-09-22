@@ -127,7 +127,6 @@ final class ProfileViewController: UIViewController, LoadingView {
     
     @objc
     private func editButtonTapped() {
-        //todo
         guard let profile else { return }
         let editVC = EditProfileViewController(profile: profile, profileService: profileService)
         editVC.delegate = self
@@ -207,13 +206,11 @@ extension ProfileViewController: ProfileInteractionDelegate {
         let previousLikes = profile?.likes ?? []
         print("📝 Previous likes: \(previousLikes)")
         
-        profile?.likes = Array(Set(likes)) // оптимистичное обновление + дедупликация
+        profile?.likes = Array(Set(likes))
         
-        // Обновляем UI немедленно
         profileCardView.configure(with: profile!)
         tableView.reloadData()
         
-        // Уведомляем все дочерние контроллеры
         notifyChildControllers(with: profile!)
         
         print("🌐 Sending updateProfile request with likes: \(likes)")
@@ -249,7 +246,6 @@ extension ProfileViewController: ProfileInteractionDelegate {
         }
     }
     
-    // Обновленный метод для уведомления дочерних контроллеров
     private func notifyChildControllers(with profile: Profile) {
         print("🔔 Notifying child controllers. Profile likes: \(profile.likes)")
         
@@ -265,7 +261,6 @@ extension ProfileViewController: ProfileInteractionDelegate {
                 print("📱 Found FavoritesNftViewController, updating with likes: \(profile.likes)")
                 favoritesVC.updateNftIDs(profile.likes)
             }
-            // MyNftViewController обновится автоматически через делегат isNftLiked
         }
     }
     
@@ -284,116 +279,3 @@ extension ProfileViewController: ProfileInteractionDelegate {
     }
 }
 
-
-//extension ProfileViewController: ProfileInteractionDelegate {
-////    func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?) {
-////            let previousLikes = profile?.likes ?? []
-////            profile?.likes = Array(Set(likes)) // optimistic update + dedupe
-////            
-////            // Update UI immediately
-////            profileCardView.configure(with: profile!)
-////            tableView.reloadData()
-////            
-////            profileService.updateProfile(
-////                name: nil,
-////                avatar: nil,
-////                description: nil,
-////                website: nil,
-////                likes: likes
-////            ) { [weak self] result in
-////                DispatchQueue.main.async {
-////                    guard let self = self else { return }
-////                    switch result {
-////                    case .success(let updatedProfile):
-////                        self.profile = updatedProfile
-////                        self.profileCardView.configure(with: updatedProfile)
-////                        self.tableView.reloadData()
-////                        completion?(updatedProfile)
-////                        
-////                    case .failure:
-////                        // Revert on failure
-////                        self.profile?.likes = previousLikes
-////                        self.profileCardView.configure(with: self.profile!)
-////                        self.tableView.reloadData()
-////                        completion?(nil)
-////                    }
-////                }
-////            }
-////        }
-//    
-//    func isNftLiked(_ nftID: String) -> Bool {
-//        profile?.likes.contains(nftID) ?? false
-//    }
-//    
-//    func didUpdateProfile(with updatedProfile: Profile) {
-//            self.profile = updatedProfile
-//            profileCardView.configure(with: updatedProfile)
-//            tableView.reloadData()
-//            notifyChildControllers(with: updatedProfile)
-//        }
-//    
-////    func didUpdateProfile(with updatedProfile: Profile) {
-////        self.profile = updatedProfile
-////        
-////        profileCardView.configure(with: updatedProfile)
-////        tableView.reloadData()
-////    }
-//    
-//    func getCurrentLikes() -> [String] {
-//            return profile?.likes ?? []
-//        }
-//    
-//    func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?) {
-//            let previousLikes = profile?.likes ?? []
-//            profile?.likes = Array(Set(likes)) // оптимистичное обновление + дедупликация
-//            
-//            // Обновляем UI немедленно
-//            profileCardView.configure(with: profile!)
-//            tableView.reloadData()
-//            
-//            // Уведомляем все дочерние контроллеры
-//            notifyChildControllers(with: profile!)
-//            
-//            profileService.updateProfile(
-//                name: nil,
-//                avatar: nil,
-//                description: nil,
-//                website: nil,
-//                likes: likes
-//            ) { [weak self] result in
-//                DispatchQueue.main.async {
-//                    guard let self = self else { return }
-//                    switch result {
-//                    case .success(let updatedProfile):
-//                        self.profile = updatedProfile
-//                        self.profileCardView.configure(with: updatedProfile)
-//                        self.tableView.reloadData()
-//                        self.notifyChildControllers(with: updatedProfile)
-//                        completion?(updatedProfile)
-//                        
-//                    case .failure(let error):
-//                        print("Failed to update likes: \(error)")
-//                        // Откат при ошибке
-//                        self.profile?.likes = previousLikes
-//                        self.profileCardView.configure(with: self.profile!)
-//                        self.tableView.reloadData()
-//                        self.notifyChildControllers(with: self.profile!)
-//                        completion?(nil)
-//                    }
-//                }
-//            }
-//        }
-//    
-//    private func notifyChildControllers(with profile: Profile) {
-//            guard let navController = navigationController else { return }
-//            
-//            for viewController in navController.viewControllers {
-//                if let favoritesVC = viewController as? FavoritesNftViewController {
-//                    favoritesVC.updateNftIDs(profile.likes)
-//                }
-//                // MyNftViewController обновится автоматически через делегат isNftLiked
-//            }
-//        }
-//    
-//    
-//}

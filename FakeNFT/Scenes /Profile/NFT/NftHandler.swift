@@ -5,24 +5,39 @@ protocol NftView: AnyObject {
     func reloadData()
 }
 
-enum NftSortOption {
-    case name
-    case price
-    case rating
+enum NftSortOption: String, CaseIterable {
+    case name = "name"
+    case price = "price"
+    case rating = "rating"
+    
+    var localizedTitle: String {
+        switch self {
+        case .name:
+            return NSLocalizedString("MyNftViewController.sortMenuName", comment: "")
+        case .price:
+            return NSLocalizedString("MyNftViewController.sortMenuPrice", comment: "")
+        case .rating:
+            return NSLocalizedString("MyNftViewController.sortMenuRating", comment: "")
+        }
+    }
 }
 
+
 final class NftHandler: LoadingView {
+    
+    private weak var view: NftView?
+    private let nftService: NftService
+    private(set) var nftIDs: [String]
+    private var nfts: [Nft] = []
+    
+    private var currentSortOption: NftSortOption = .name
+
     internal lazy var activityIndicator: UIActivityIndicatorView = {
         let indicator = UIActivityIndicatorView(style: .large)
         indicator.hidesWhenStopped = true
         indicator.translatesAutoresizingMaskIntoConstraints = false
         return indicator
     }()
-    
-    private weak var view: NftView?
-    private let nftService: NftService
-    private(set) var nftIDs: [String]
-    private var nfts: [Nft] = []
     
     init(view: NftView, services: ServicesAssembly, nftIDs: [String]) {
         self.view = view
@@ -31,6 +46,7 @@ final class NftHandler: LoadingView {
     }
     
     func viewDidLoad() {
+        currentSortOption = SortStorage.shared.myNftSortOption
         reloadNfts()
     }
     
@@ -60,6 +76,7 @@ final class NftHandler: LoadingView {
         guard index < nftIDs.count else {
             DispatchQueue.main.async {
                 self.hideLoading()
+                self.applySavedSort()
                 self.view?.reloadData()
             }
             return
@@ -83,16 +100,27 @@ final class NftHandler: LoadingView {
     }
     
     func sort(by option: NftSortOption) {
-        switch option {
-        case .name:
-            nfts.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
-        case .price:
-            nfts.sort { $0.price < $1.price }
-        case .rating:
-            nfts.sort { $0.rating > $1.rating }
-        }
+        currentSortOption = option
+        SortStorage.shared.myNftSortOption = option
+        
+        applySortOption(option)
         view?.reloadData()
     }
+    
+    private func applySavedSort() {
+          applySortOption(currentSortOption)
+      }
+      
+      private func applySortOption(_ option: NftSortOption) {
+          switch option {
+          case .name:
+              nfts.sort { $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending }
+          case .price:
+              nfts.sort { $0.price < $1.price }
+          case .rating:
+              nfts.sort { $0.rating > $1.rating }
+          }
+      }
     
     var numberOfItems: Int {
         return nfts.count

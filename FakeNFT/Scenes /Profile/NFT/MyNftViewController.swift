@@ -146,20 +146,22 @@ final class MyNftViewController: UIViewController, NftView {
             preferredStyle: .actionSheet
         )
         
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("MyNftViewController.sortMenuName", comment: ""),
-            style: .default
-        ) { _ in self.handler.sort(by: .name) })
+        let currentSort = SortStorage.shared.myNftSortOption
         
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("MyNftViewController.sortMenuPrice", comment: ""),
-            style: .default
-        ) { _ in self.handler.sort(by: .price) })
-        
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("MyNftViewController.sortMenuRating", comment: ""),
-            style: .default
-        ) { _ in self.handler.sort(by: .rating) })
+        for sortOption in NftSortOption.allCases {
+            let action = UIAlertAction(
+                title: sortOption.localizedTitle,
+                style: .default
+            ) { [weak self] _ in
+                self?.handler.sort(by: sortOption)
+            }
+            
+            if sortOption == currentSort {
+                action.setValue(true, forKey: "checked")
+            }
+            
+            alert.addAction(action)
+        }
         
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("MyNftViewController.sortMenuCancel", comment: ""),

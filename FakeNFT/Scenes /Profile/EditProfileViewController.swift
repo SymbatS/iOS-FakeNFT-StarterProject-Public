@@ -313,7 +313,6 @@ final class EditProfileViewController: UIViewController, LoadingView {
                 self?.delegate?.didUpdateProfile(with: updatedProfile)
                 self?.navigationController?.popViewController(animated: true)
             case .failure(let error):
-                // Обработка ошибки, например, показать алерт
                 print("Ошибка обновления: \(error)")
             }
         }

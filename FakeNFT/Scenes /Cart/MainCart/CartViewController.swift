@@ -1,7 +1,7 @@
 import UIKit
 import Kingfisher
 
-final class CartViewController: UIViewController {
+final class CartViewController: UIViewController, LoadingView, ErrorView{
     
     var servicesAssembly: ServicesAssembly
     let cartService: CartService
@@ -26,6 +26,11 @@ final class CartViewController: UIViewController {
     
     var totalSum: Float = 0
     
+    let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
     
     init(servicesAssembly: ServicesAssembly, cartService: CartService) {
         self.servicesAssembly = servicesAssembly
@@ -36,21 +41,21 @@ final class CartViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        loadCart()
-        
-    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupActivityIndicator()
+        loadCart()
         setupUI()
+        
     }
     
     private func loadCart(){
+        showLoading()
         cartService.fetchCart(orderId: "1") { [weak self] result in
             switch result {
             case .success(let nfts):
-                print("В корзине \(nfts.count) NFT")
+                self?.hideLoading()
                 let mapped: [CartNfts] = nfts.map {
                     CartNfts(
                         id: $0.id,
@@ -71,11 +76,27 @@ final class CartViewController: UIViewController {
                     self?.bottomViewUpadte()
                     self?.view.layoutIfNeeded()
                 }
-                
             case .failure(let error):
-                print("Ошибка: \(error)")
+                print(error)
+                self?.hideLoading()
+                self?.repeatCartRequest(error)
             }
         }
+    }
+    func repeatCartRequest(_ error: Error){
+        let error = ErrorModel(message: NSLocalizedString("Error.title", comment: ""),
+                               actionText: error.localizedDescription,
+                               action: { [weak self] in
+            self?.loadCart()
+        })
+        showError(error)
+    }
+    private func setupActivityIndicator(){
+        view.addSubviews(activityIndicator)
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
     }
     
     private func setupUI(){
@@ -87,10 +108,9 @@ final class CartViewController: UIViewController {
         bottomView.delegate = self
         bottomViewUpadte()
         view.addSubviews(tableview,bottomView,emptyLabel)
+        [tableview, bottomView, emptyLabel].forEach { $0.isHidden = true }
+        view.bringSubviewToFront(activityIndicator)
         let safeArea = view.safeAreaLayoutGuide
-        let isNftsEmpty = nfts.isEmpty
-        isCartEmpty(isNftsEmpty)
-        view.layoutIfNeeded()
         NSLayoutConstraint.activate([
             bottomView.bottomAnchor.constraint(equalTo: safeArea.bottomAnchor),
             bottomView.heightAnchor.constraint(equalToConstant: 76),
@@ -106,12 +126,14 @@ final class CartViewController: UIViewController {
             emptyLabel.centerYAnchor.constraint(equalTo: safeArea.centerYAnchor)
         ])
     }
+    
     private func isCartEmpty(_ isEmpty: Bool){
         tableview.isHidden = isEmpty
         bottomView.isHidden = isEmpty
         emptyLabel.isHidden = !isEmpty
         setupNavBar(isEmpty)
     }
+    
     private func setupNavBar(_ isEmpty: Bool){
         let sortButton = UIBarButtonItem(
             image: UIImage(resource: .sort),
@@ -123,6 +145,7 @@ final class CartViewController: UIViewController {
         let emptyButton = UIBarButtonItem(image: nil, style: .done, target: nil, action: nil)
         navigationItem.rightBarButtonItem = isEmpty ? emptyButton : sortButton
     }
+    
     @objc private func didTapSortButton(){
         let alert = UIAlertController(title: "Сортировка", message: nil, preferredStyle: .actionSheet)
         let sortByPrice = UIAlertAction(title: "По цене", style: .default) { [weak self] _ in
@@ -224,8 +247,11 @@ extension CartViewController: CartCellDelegate {
 extension CartViewController: BottomCartViewDelegate{
     
     func didTapCartButton() {
-        let vc = CurrencyViewContreller(currencyService: servicesAssembly.currencyService, servicesAssembly: servicesAssembly)
+        let vc = CurrencyViewContreller(currencyService: servicesAssembly.currencyService, servicesAssembly: servicesAssembly, paymentService: servicesAssembly.paymentService)
         vc.hidesBottomBarWhenPushed = true
+        vc.onPaymentSuccess = { [weak self] in
+            self?.loadCart()
+        }
         navigationController?.pushViewController(vc, animated: true)
     }
 }

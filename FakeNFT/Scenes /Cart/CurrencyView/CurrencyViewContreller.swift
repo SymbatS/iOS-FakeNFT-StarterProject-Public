@@ -1,9 +1,10 @@
 import UIKit
 import Kingfisher
 
-class CurrencyViewContreller: UIViewController {
+class CurrencyViewContreller: UIViewController, LoadingView, ErrorView {
     let currencyService: CurrencyService
     var servicesAssembly: ServicesAssembly
+    let paymentService: PaymentService
     
     let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -14,17 +15,29 @@ class CurrencyViewContreller: UIViewController {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         return collectionView
     }()
+    
+    let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.hidesWhenStopped = true
+        return indicator
+    }()
+    
     let bottomView = CurrencyBottomView()
+    
+    static let reuseIdentifier = "Cell"
     
     var currency: [Currency] = []
     
-    let reuseIdentifier = "Cell"
-    
     var checkedCellIndex = IndexPath(item: 0, section: 0)
     
-    init(currencyService: CurrencyService,servicesAssembly: ServicesAssembly) {
+    var checkedCurrencyId: String?
+    
+    var onPaymentSuccess: (() -> Void)?
+    
+    init(currencyService: CurrencyService,servicesAssembly: ServicesAssembly, paymentService: PaymentService) {
         self.currencyService = currencyService
         self.servicesAssembly = servicesAssembly
+        self.paymentService = paymentService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -34,34 +47,68 @@ class CurrencyViewContreller: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadCurrency()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
+        setupActivityIndicator()
+        loadCurrency()
         setupUI()
     }
     
     private func loadCurrency(){
+        showLoading()
         currencyService.fetchCurrency(){ [weak self] result in
             switch result{
             case .success(let currency):
                 self?.currency = currency
+                self?.checkedCurrencyId = currency[0].id
                 self?.collectionView.reloadData()
+                self?.hideLoading()
             case .failure(let error):
                 print(error)
+                self?.hideLoading()
+                self?.repeatRequest(type:.currency)
             }
         }
     }
     
+    private func repeatRequest(type:ErrorType){
+        let message = NSLocalizedString("Error.title", comment: "")
+        let actionText = NSLocalizedString("Error.repeat", comment: "")
+        let action: (() -> Void) = { [weak self] in
+            switch type{
+            case .currency:
+                self?.loadCurrency()
+            case .payment:
+                self?.didTapPayButton()
+            }
+        }
+        
+        let error = ErrorModel(message: message, actionText: actionText, action: action)
+        showError(error)
+    }
+    
+    private func setupActivityIndicator(){
+        view.addSubview(activityIndicator)
+        activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+        ])
+    }
+    
     private func setupUI(){
         setupNavBar()
+        bottomView.agreementText.delegate = self
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(CurrencyViewCell.self, forCellWithReuseIdentifier: reuseIdentifier)
+        bottomView.delegate = self
+        collectionView.register(CurrencyViewCell.self, forCellWithReuseIdentifier: CurrencyViewContreller.reuseIdentifier)
         view.addSubviews(collectionView,bottomView)
         let safeArea = view.safeAreaLayoutGuide
+        view.bringSubviewToFront(activityIndicator)
         NSLayoutConstraint.activate([
             collectionView.topAnchor.constraint(equalTo: safeArea.topAnchor, constant: 20),
             collectionView.leadingAnchor.constraint(equalTo: safeArea.leadingAnchor, constant: 16),
@@ -96,7 +143,7 @@ extension CurrencyViewContreller: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? CurrencyViewCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CurrencyViewContreller.reuseIdentifier, for: indexPath) as? CurrencyViewCell else {
             assertionFailure("no cell for CurrencyViewCell")
             return UICollectionViewCell()
         }
@@ -130,7 +177,60 @@ extension CurrencyViewContreller: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let previousChecked = checkedCellIndex
         checkedCellIndex = indexPath
+        checkedCurrencyId = currency[indexPath.row].id
         collectionView.reloadItems(at: [previousChecked])
         collectionView.reloadItems(at: [checkedCellIndex])
+    }
+}
+
+extension CurrencyViewContreller: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        
+        let vc = WebViewController(url: URL)
+        navigationController?.pushViewController(vc, animated: true)
+        return false
+    }
+}
+
+extension CurrencyViewContreller: CurrencyBottomViewDelegate {
+    func didTapPayButton() {
+        showLoading()
+        guard let checkedId = checkedCurrencyId else { return }
+        paymentService.tryPayment(currencyId: checkedId){ [weak self] result in
+            switch result {
+            case .success(let payment):
+                print(payment)
+                self?.hideLoading()
+                payment.success ? self?.pushResultScreen() : self?.showPaymentError()
+            case .failure(let error):
+                print(error)
+                self?.hideLoading()
+                self?.repeatRequest(type: .payment)
+            }
+        }
+    }
+    
+    func pushResultScreen(){
+        let vc = PaymentViewController()
+        vc.onPaymentSuccess = { [weak self] in
+            self?.onPaymentSuccess?()
+        }
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    func showPaymentError() {
+        let alert = UIAlertController(title: "Не удалось произвести оплату", message: "", preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: "Отмена", style: .default) { [weak self] _ in
+            self?.dismiss(animated: true)
+        }
+        
+        let repeatAction = UIAlertAction(title: "Повторить", style: .default) { [weak self] _ in
+            self?.dismiss(animated: true)
+            self?.didTapPayButton()
+        }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(repeatAction)
+        alert.preferredAction = repeatAction
+        present(alert, animated: true)
     }
 }

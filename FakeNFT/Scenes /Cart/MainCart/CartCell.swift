@@ -39,12 +39,14 @@ final class CartCell: UITableViewCell {
         label.text = "Цена"
         return label
     }()
+    
     let nftPriceLabel: UILabel = {
         let label = UILabel()
         label.font = .bodyBold
         label.textColor = .segmentActive
         return label
     }()
+    
     let deleteNftButton: UIButton = {
        let button = UIButton()
         button.setImage(UIImage(resource: .deleteFromCart), for: .normal)
@@ -59,6 +61,7 @@ final class CartCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     private func setupUI(){
         contentView.addSubviews(nftImageView, starRating, nftNameLabel, priceLabel, nftPriceLabel, deleteNftButton)
         deleteNftButton.addTarget(self, action: #selector(deleteButtonTapped), for: .touchUpInside)

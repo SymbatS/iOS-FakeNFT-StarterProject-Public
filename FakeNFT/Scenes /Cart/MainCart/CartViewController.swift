@@ -2,6 +2,7 @@ import UIKit
 import Kingfisher
 
 final class CartViewController: UIViewController {
+    
     var servicesAssembly: ServicesAssembly
     let cartService: CartService
     
@@ -10,7 +11,9 @@ final class CartViewController: UIViewController {
         tableView.separatorStyle = .none
         return tableView
     }()
+    
     let bottomView = BottomCartView()
+    
     let emptyLabel: UILabel = {
         let label = UILabel()
         label.font = .bodyBold
@@ -20,8 +23,9 @@ final class CartViewController: UIViewController {
     }()
     
     var nfts: [CartNfts] = []
+    
     var totalSum: Float = 0
-
+    
     
     init(servicesAssembly: ServicesAssembly, cartService: CartService) {
         self.servicesAssembly = servicesAssembly
@@ -34,7 +38,15 @@ final class CartViewController: UIViewController {
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        loadCart()
         
+    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupUI()
+    }
+    
+    private func loadCart(){
         cartService.fetchCart(orderId: "1") { [weak self] result in
             switch result {
             case .success(let nfts):
@@ -65,14 +77,14 @@ final class CartViewController: UIViewController {
             }
         }
     }
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupUI()
-    }
+    
     private func setupUI(){
+        view.backgroundColor = .white
+        navigationItem.backButtonTitle = ""
         tableview.delegate = self
         tableview.dataSource = self
         tableview.register(CartCell.self, forCellReuseIdentifier: "cell")
+        bottomView.delegate = self
         bottomViewUpadte()
         view.addSubviews(tableview,bottomView,emptyLabel)
         let safeArea = view.safeAreaLayoutGuide
@@ -130,6 +142,7 @@ final class CartViewController: UIViewController {
         })
         present(alert, animated: true)
     }
+    
     private func sort(by: Sort){
         
         switch by {
@@ -142,11 +155,13 @@ final class CartViewController: UIViewController {
         }
         tableview.reloadData()
     }
+    
     private func bottomViewUpadte(){
         bottomView.nftCount = nfts.count
         bottomView.totalSum = totalSum
     }
 }
+
 extension CartViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         140
@@ -204,5 +219,13 @@ extension CartViewController: CartCellDelegate {
                 }
             }
         }
+    }
+}
+extension CartViewController: BottomCartViewDelegate{
+    
+    func didTapCartButton() {
+        let vc = CurrencyViewContreller(currencyService: servicesAssembly.currencyService, servicesAssembly: servicesAssembly)
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
     }
 }

@@ -307,17 +307,15 @@ final class EditProfileViewController: UIViewController, LoadingView {
             likes: currentProfile.likes
         )
         
-        profileService.updateProfile(with: updatedProfile) { [weak self] result in
+        profileService.updateProfile(name: updatedProfile.name, avatar: updatedProfile.avatar, description: updatedProfile.description, website: updatedProfile.website,likes: updatedProfile.likes) { [weak self] result in
             switch result {
             case .success:
                 self?.delegate?.didUpdateProfile(with: updatedProfile)
                 self?.navigationController?.popViewController(animated: true)
             case .failure(let error):
-                // Обработка ошибки, например, показать алерт
                 print("Ошибка обновления: \(error)")
             }
         }
-        
     }
     
     private func updateSaveButtonState() {

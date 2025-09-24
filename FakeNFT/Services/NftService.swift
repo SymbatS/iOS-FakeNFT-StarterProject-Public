@@ -1,6 +1,6 @@
 import Foundation
 
-typealias NftCompletion = (Result<Nft, Error>) -> Void
+typealias NftCompletion = (Result<NftDTO, Error>) -> Void
 
 protocol NftService {
     func loadNft(id: String, completion: @escaping NftCompletion)
@@ -17,16 +17,16 @@ final class NftServiceImpl: NftService {
     }
 
     func loadNft(id: String, completion: @escaping NftCompletion) {
-        if let nft = storage.getNft(with: id) {
-            completion(.success(nft))
-            return
-        }
+//        if let nft = storage.getNft(with: id) {
+//            completion(.success(nft.toDomain()))
+//            return
+//        }
 
         let request = NFTRequest(id: id)
-        networkClient.send(request: request, type: Nft.self) { [weak storage] result in
+        networkClient.send(request: request, type: NftDTO.self) { [weak storage] result in
             switch result {
             case .success(let nft):
-                storage?.saveNft(nft)
+                storage?.saveNft(nft.toDomain())
                 completion(.success(nft))
             case .failure(let error):
                 completion(.failure(error))

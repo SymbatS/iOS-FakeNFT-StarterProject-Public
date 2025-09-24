@@ -2,6 +2,9 @@ import UIKit
 
 protocol ProfileInteractionDelegate: AnyObject {
     func didUpdateProfile(with updatedProfile: Profile)
+    func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?)
+    func isNftLiked(_ nftID: String) -> Bool
+    func getCurrentLikes() -> [String]
 }
 
 final class ProfileViewController: UIViewController, LoadingView {
@@ -89,6 +92,9 @@ final class ProfileViewController: UIViewController, LoadingView {
         button.tintColor = .label
         button.addTarget(self, action: #selector(editButtonTapped), for: .touchUpInside)
         let barButtonItem = UIBarButtonItem(customView: button)
+        
+        
+        
         navigationItem.rightBarButtonItem = barButtonItem
     }
     
@@ -103,13 +109,14 @@ final class ProfileViewController: UIViewController, LoadingView {
                 guard let self = self else { return }
                 switch result {
                 case .success(let profile):
-                    self.hideLoading() // Используем метод протокола
+                    self.hideLoading() 
                     self.profileCardView.isHidden = false
                     self.tableView.isHidden = false
                     
                     self.profile = profile
                     self.profileCardView.configure(with: profile)
                     self.tableView.reloadData()
+                    print("success fetching profile")
                 case .failure(let error):
                     //TODO: Show alert to user
                     print("Error fetching profile: \(error)")
@@ -120,7 +127,6 @@ final class ProfileViewController: UIViewController, LoadingView {
     
     @objc
     private func editButtonTapped() {
-        //todo
         guard let profile else { return }
         let editVC = EditProfileViewController(profile: profile, profileService: profileService)
         editVC.delegate = self
@@ -129,6 +135,7 @@ final class ProfileViewController: UIViewController, LoadingView {
     }
     
 }
+
 //MARK: TableView methods
 extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -169,18 +176,88 @@ extension ProfileViewController: UITableViewDataSource, UITableViewDelegate {
         guard let profile = self.profile else { return }
         
         if let viewControllerToPresent = action.makeViewController(profile: profile, servicesAssembly: servicesAssembly) {
+            if let favNftVC = viewControllerToPresent as? FavoritesNftViewController {
+
+                favNftVC.delegate = self
+            }
+            if let myNftVC = viewControllerToPresent as? MyNftViewController {
+
+                myNftVC.delegate = self
+            }
             self.navigationController?.pushViewController(viewControllerToPresent, animated: true)
         }
     }
     
 }
 
-
 extension ProfileViewController: ProfileInteractionDelegate {
+    
+    func getCurrentLikes() -> [String] {
+        let likes = profile?.likes ?? []
+        return likes
+    }
+    
+    func didUpdateLikes(_ likes: [String], completion: ((Profile?) -> Void)?) {
+        let previousLikes = profile?.likes ?? []
+        
+        profile?.likes = Array(Set(likes))
+        
+        profileCardView.configure(with: profile!)
+        tableView.reloadData()
+        
+        profileService.updateProfile(
+            name: nil,
+            avatar: nil,
+            description: nil,
+            website: nil,
+            likes: likes
+        ) { [weak self] result in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                switch result {
+                case .success(let updatedProfile):
+                    print("✅ Server success: \(updatedProfile.likes)")
+                    self.profile = updatedProfile
+                    self.profileCardView.configure(with: updatedProfile)
+                    self.tableView.reloadData()
+                    
+                    self.notifyChildControllers(with: updatedProfile)
+                    completion?(updatedProfile)
+                    
+                case .failure(let error):
+                    self.profile?.likes = previousLikes
+                    self.profileCardView.configure(with: self.profile!)
+                    self.tableView.reloadData()
+                    
+                    self.notifyChildControllers(with: self.profile!)
+                    completion?(nil)
+                }
+            }
+        }
+    }
+    
+    private func notifyChildControllers(with profile: Profile) {
+        print("🔔 Notifying controllers with likes: \(profile.likes)")
+        
+        guard let navController = navigationController else { return }
+        
+        for viewController in navController.viewControllers {
+            if let favoritesVC = viewController as? FavoritesNftViewController {
+                print("📱 Updating FavoritesVC with: \(profile.likes)")
+                favoritesVC.updateNftIDs(profile.likes)
+            }
+        }
+    }
+    
+    func isNftLiked(_ nftID: String) -> Bool {
+        let isLiked = profile?.likes.contains(nftID) ?? false
+        return isLiked
+    }
+    
     func didUpdateProfile(with updatedProfile: Profile) {
         self.profile = updatedProfile
-        
         profileCardView.configure(with: updatedProfile)
         tableView.reloadData()
+        notifyChildControllers(with: updatedProfile)
     }
 }

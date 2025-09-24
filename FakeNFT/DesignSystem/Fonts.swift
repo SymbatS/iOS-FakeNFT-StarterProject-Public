@@ -18,3 +18,18 @@ extension UIFont {
     static var caption2 = UIFont.systemFont(ofSize: 13, weight: .regular)
     static var caption3 = UIFont.systemFont(ofSize: 10, weight: .medium)
 }
+
+
+extension NSAttributedString {
+    static func withLetterSpacing(
+        _ text: String,
+        font: UIFont = .systemFont(ofSize: 13, weight: .regular),
+        spacing: CGFloat = -0.08
+    ) -> NSAttributedString {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: font,
+            .kern: spacing
+        ]
+        return NSAttributedString(string: text, attributes: attributes)
+    }
+}

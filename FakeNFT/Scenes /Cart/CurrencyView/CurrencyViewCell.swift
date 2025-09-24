@@ -9,17 +9,27 @@ class CurrencyViewCell: UICollectionViewCell {
         imageView.clipsToBounds = true
         return imageView
     }()
+    
     let titleLabel: UILabel = {
         let label = UILabel()
         label.font = .bodyRegular
         label.textColor = .segmentActive
         return label
     }()
+    
     let shortTitleLabel: UILabel = {
        let label = UILabel()
         label.font = .bodyRegular
-        label.textColor = .green
+        label.textColor = .greenUniversal
         return label
+    }()
+    
+    let vStack: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.spacing = 0
+        stack.distribution = .fillEqually
+        return stack
     }()
 
     var isChecked: Bool = false {
@@ -30,24 +40,23 @@ class CurrencyViewCell: UICollectionViewCell {
             clipsToBounds = true
         }
     }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     private func setupUI(){
         contentView.backgroundColor = .segmentInactive
         contentView.layer.cornerRadius = 12
         contentView.clipsToBounds = true
-        let vstack = UIStackView()
-        vstack.axis = .vertical
-        vstack.spacing = 1
-        vstack.distribution = .fillEqually
-        vstack.addArrangedSubview(titleLabel)
-        vstack.addArrangedSubview(shortTitleLabel)
-        contentView.addSubviews(currencyImageView,vstack)
+        vStack.addArrangedSubview(titleLabel)
+        vStack.addArrangedSubview(shortTitleLabel)
+        contentView.addSubviews(currencyImageView,vStack)
         
         NSLayoutConstraint.activate([
             currencyImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
@@ -55,8 +64,10 @@ class CurrencyViewCell: UICollectionViewCell {
             currencyImageView.widthAnchor.constraint(equalToConstant: 36),
             currencyImageView.heightAnchor.constraint(equalToConstant: 36),
             
-            vstack.leadingAnchor.constraint(equalTo: currencyImageView.trailingAnchor, constant: 4),
-            vstack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            vStack.leadingAnchor.constraint(equalTo: currencyImageView.trailingAnchor, constant: 4),
+            vStack.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            vStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            vStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
         ])
     }
 }

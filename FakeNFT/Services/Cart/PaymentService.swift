@@ -13,7 +13,7 @@ final class PaymentService{
                 CartService(networkClient: self.networkClient).updateNfts(orderId: "1", nfts: []){ result in
                     switch result {
                     case .success(_):
-                        print ("asd")
+                        print("Successfull payment")
                     case .failure(let error):
                         print(error)
                     }

@@ -22,4 +22,9 @@ final class ServicesAssembly {
             networkClient: networkClient
         )
     }
+    var paymentService: PaymentService{
+        PaymentService(
+            networkClient: networkClient
+        )
+    }
 }

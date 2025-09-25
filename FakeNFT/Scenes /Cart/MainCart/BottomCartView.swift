@@ -31,6 +31,7 @@ class BottomCartView: UIView{
         let button = UIButton()
         button.setTitle(NSLocalizedString("cart.ready", comment: ""), for: .normal)
         button.setTitleColor(.textOnPrimary, for: .normal)
+        button.titleLabel?.font = .bodyBold
         button.backgroundColor = .black
         button.layer.cornerRadius = 16
         button.clipsToBounds = true
@@ -61,7 +62,6 @@ class BottomCartView: UIView{
     }
     @objc private func cartButtonDidTap(){
         delegate?.didTapCartButton()
-        print("cartButtonDidTap")
     }
     
     init() {

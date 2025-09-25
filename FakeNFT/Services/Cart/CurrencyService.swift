@@ -11,7 +11,6 @@ final class CurrencyService{
         networkClient.send(request: request, type: [Currency].self){ result in
             switch result {
             case .success(let currency):
-                print(currency)
                 results.append(contentsOf: currency)
                 completion(.success(results))
             case .failure(let error):

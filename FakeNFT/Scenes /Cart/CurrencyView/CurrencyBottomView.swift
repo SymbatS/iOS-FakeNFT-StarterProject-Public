@@ -5,17 +5,21 @@ class CurrencyBottomView: UIView {
         let textView = UITextView()
         textView.isEditable = false
         textView.isScrollEnabled = false
+        textView.isSelectable = true
         textView.isUserInteractionEnabled = true
         textView.dataDetectorTypes = []
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 4
         let text = "Совершая покупку, вы соглашаетесь с условиями Пользовательского соглашения"
         let attributedString = NSMutableAttributedString(string: text, attributes: [
+            .paragraphStyle: paragraphStyle,
             .font: UIFont.caption2,
             .foregroundColor: UIColor.segmentActive
         ])
 
         if let range = text.range(of: "Пользовательского соглашения") {
             let nsRange = NSRange(range, in: text)
-            attributedString.addAttribute(.link, value: " https://yandex.ru/legal/practicum_termsofuse", range: nsRange)
+            attributedString.addAttribute(.link, value: termsURL, range: nsRange)
         }
         textView.attributedText = attributedString
         textView.backgroundColor = .clear
@@ -23,15 +27,20 @@ class CurrencyBottomView: UIView {
         textView.textContainer.lineFragmentPadding = 0
         return textView
     }()
+    
     let payButton: UIButton = {
         let button = UIButton()
         button.setTitle("Оплатить", for: .normal)
-        button.setTitleColor(.white, for: .normal)
+        button.setTitleColor(.textOnPrimary, for: .normal)
+        button.titleLabel?.font = .bodyBold
         button.layer.cornerRadius = 12
         button.clipsToBounds = true
         button.backgroundColor = .black
         return button
     }()
+    static let termsURL = "https://yandex.ru/legal/practicum_termsofuse"
+    weak var delegate: CurrencyBottomViewDelegate?
+    
     init() {
         super.init(frame: .zero)
         setupUI()
@@ -40,6 +49,7 @@ class CurrencyBottomView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     private func setupUI(){
         backgroundColor = .segmentInactive
         layer.cornerRadius = 12
@@ -59,6 +69,6 @@ class CurrencyBottomView: UIView {
         ])
     }
     @objc private func payButtonTapped(){
-        print("payButtonTapped")
+        delegate?.didTapPayButton()
     }
 }

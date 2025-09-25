@@ -1,43 +1,90 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
+
+    private enum TabBarItem: Int {
+        case profile
+        case catalog
+        case basket
+        case stats
+        
+        var title: String {
+            switch self {
+            case .profile:
+                return "Профиль"
+            case .catalog:
+                return "Каталог"
+            case .basket:
+                return "Корзина"
+            case .stats:
+                return "Статистика"
+            }
+            
+        }
+        var iconName: String {
+            switch self {
+            case .profile:
+                return "Profile"
+            case .catalog:
+                return "Catalog"
+            case .basket:
+                return "Basket"
+            case .stats:
+                return "Stats"
+            }
+        }
+    }
     
-    var servicesAssembly: ServicesAssembly!
+    let servicesAssembly: ServicesAssembly
+
     
-    private let profileTabBarItem = UITabBarItem(
-        title: NSLocalizedString("Tab.profile", comment: ""),
-        image: UIImage(systemName: "person.circle.fill"),
-        tag: 0
-    )
+    init(servicesAssembly: ServicesAssembly) {
+        self.servicesAssembly = servicesAssembly
+        super.init(nibName: nil, bundle: nil)
+    }
     
-    private let catalogTabBarItem = UITabBarItem(
-        title: NSLocalizedString("Tab.catalog", comment: ""),
-        image: UIImage(systemName: "square.stack.3d.up.fill"),
-        tag: 1
-    )
-    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let catalogController = TestCatalogViewController(
-            servicesAssembly: servicesAssembly
-        )
-        catalogController.tabBarItem = catalogTabBarItem
+        setupTabBarItems()
+    }
+    
+    private func setupTabBarItems() {
+        tabBar.tintColor = .systemBlue
+        tabBar.unselectedItemTintColor = .black
+        let networkClient = DefaultNetworkClient()
+        let catalogService = CatalogServiceImpl(client: networkClient)
+        let catalogVC = CatalogViewController(catalogService: catalogService)
         
         let profileService = servicesAssembly.profileService
-        let profileController = ProfileViewController(
+        let profileVC = ProfileViewController(
             servicesAssembly: servicesAssembly,
             profileService: profileService
+        )        let basketVC = CartViewController(
+            servicesAssembly: servicesAssembly,
+            cartService: servicesAssembly.cartService
         )
+        let statsVC = StatsViewController()
         
-        let profileNavigationController = UINavigationController(rootViewController: profileController)
-        profileNavigationController.tabBarItem = profileTabBarItem
+        viewControllers = [
+            wrappedInNavigationController(with: profileVC),
+            wrappedInNavigationController(with: catalogVC),
+            wrappedInNavigationController(with: basketVC),
+            wrappedInNavigationController(with: statsVC)
+        ]
         
-
-        
-        viewControllers = [profileNavigationController,catalogController]
-        
-        view.backgroundColor = .systemBackground
+        viewControllers?.enumerated().forEach {
+            guard let item = TabBarItem(rawValue: $0) else { return }
+            let controller = $1
+            controller.tabBarItem.title = item.title
+            controller.tabBarItem.image = UIImage(named: item.iconName)
+        }
+    }
+    
+    private func wrappedInNavigationController(with: UIViewController) -> UINavigationController {
+        return UINavigationController(rootViewController: with)
     }
 }

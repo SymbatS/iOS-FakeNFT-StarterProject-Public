@@ -34,7 +34,7 @@ final class TabBarController: UITabBarController {
         }
     }
     
-    private let servicesAssembly: ServicesAssembly
+    let servicesAssembly: ServicesAssembly
     
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly

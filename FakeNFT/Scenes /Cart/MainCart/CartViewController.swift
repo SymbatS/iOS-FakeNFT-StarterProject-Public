@@ -21,6 +21,7 @@ final class CartViewController: UIViewController, LoadingView, ErrorView{
         label.textColor = .segmentActive
         return label
     }()
+    let refreshControl = UIRefreshControl()
     
     var nfts: [CartNfts] = []
     
@@ -74,11 +75,13 @@ final class CartViewController: UIViewController, LoadingView, ErrorView{
                     self?.isCartEmpty(isNftsEmpty)
                     self?.tableview.reloadData()
                     self?.bottomViewUpadte()
+                    self?.refreshControl.endRefreshing()
                     self?.view.layoutIfNeeded()
                 }
             case .failure(let error):
                 print(error)
                 self?.hideLoading()
+                self?.refreshControl.endRefreshing()
                 self?.repeatCartRequest(error)
             }
         }
@@ -105,10 +108,12 @@ final class CartViewController: UIViewController, LoadingView, ErrorView{
         tableview.delegate = self
         tableview.dataSource = self
         tableview.register(CartCell.self, forCellReuseIdentifier: "cell")
+        refreshControl.addTarget(self, action: #selector(refreshData(_:)), for: .valueChanged)
+        tableview.refreshControl = refreshControl
         bottomView.delegate = self
         bottomViewUpadte()
         view.addSubviews(tableview,bottomView,emptyLabel)
-        [tableview, bottomView, emptyLabel].forEach { $0.isHidden = true }
+        [bottomView, emptyLabel].forEach { $0.isHidden = true }
         view.bringSubviewToFront(activityIndicator)
         let safeArea = view.safeAreaLayoutGuide
         NSLayoutConstraint.activate([
@@ -128,21 +133,22 @@ final class CartViewController: UIViewController, LoadingView, ErrorView{
     }
     
     private func isCartEmpty(_ isEmpty: Bool){
-        tableview.isHidden = isEmpty
-        bottomView.isHidden = isEmpty
-        emptyLabel.isHidden = !isEmpty
-        setupNavBar(isEmpty)
+        setupNavBar()
+        DispatchQueue.main.async { [weak self] in
+            self?.bottomView.isHidden = isEmpty
+            self?.emptyLabel.isHidden = !isEmpty
+            self?.navigationController?.setNavigationBarHidden(isEmpty, animated: true)
+        }
     }
     
-    private func setupNavBar(_ isEmpty: Bool){
+    private func setupNavBar(){
         let sortButton = UIBarButtonItem(
             image: UIImage(resource: .sort),
             style: .plain,
             target: self,
             action: #selector(didTapSortButton))
         sortButton.tintColor = .black
-        let emptyButton = UIBarButtonItem(image: nil, style: .done, target: nil, action: nil)
-        navigationItem.rightBarButtonItem = isEmpty ? emptyButton : sortButton
+        navigationItem.rightBarButtonItem =  sortButton
     }
     
     @objc private func didTapSortButton(){
@@ -163,6 +169,15 @@ final class CartViewController: UIViewController, LoadingView, ErrorView{
             alert.addAction($0)
         })
         present(alert, animated: true)
+    }
+    
+    @objc private func refreshData(_ sender: UIRefreshControl) {
+        [bottomView, emptyLabel].forEach { $0.isHidden = true }
+        loadCart()
+        DispatchQueue.main.async {
+            self.navigationController?.navigationBar.setNeedsLayout()
+            self.navigationController?.navigationBar.layoutIfNeeded()
+        }
     }
     
     private func sort(by: Sort){

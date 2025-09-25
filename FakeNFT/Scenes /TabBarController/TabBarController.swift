@@ -63,13 +63,12 @@ final class TabBarController: UITabBarController {
             servicesAssembly: servicesAssembly,
             cartService: servicesAssembly.cartService
         )
-        let cartNav = UINavigationController(rootViewController: basketVC)
         let statsVC = StatsViewController()
         
         viewControllers = [
             wrappedInNavigationController(with: profileVC),
             wrappedInNavigationController(with: catalogVC),
-            wrappedInNavigationController(with: cartNav),
+            wrappedInNavigationController(with: basketVC),
             wrappedInNavigationController(with: statsVC)
         ]
         

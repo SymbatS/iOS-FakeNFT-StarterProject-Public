@@ -141,7 +141,6 @@ final class CartViewController: UIViewController, LoadingView, ErrorView{
             target: self,
             action: #selector(didTapSortButton))
         sortButton.tintColor = .black
-        sortButton.imageInsets = UIEdgeInsets(top: 0, left: 8, bottom: 0, right: -30)
         let emptyButton = UIBarButtonItem(image: nil, style: .done, target: nil, action: nil)
         navigationItem.rightBarButtonItem = isEmpty ? emptyButton : sortButton
     }

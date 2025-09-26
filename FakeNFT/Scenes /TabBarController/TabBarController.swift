@@ -34,7 +34,8 @@ final class TabBarController: UITabBarController {
         }
     }
     
-    private let servicesAssembly: ServicesAssembly
+    let servicesAssembly: ServicesAssembly
+
     
     init(servicesAssembly: ServicesAssembly) {
         self.servicesAssembly = servicesAssembly
@@ -58,7 +59,10 @@ final class TabBarController: UITabBarController {
         let catalogVC = CatalogViewController(catalogService: catalogService)
         
         let profileVC = ProfileViewController()
-        let basketVC = BasketViewController()
+        let basketVC = CartViewController(
+            servicesAssembly: servicesAssembly,
+            cartService: servicesAssembly.cartService
+        )
         let statsVC = StatsViewController()
         
         viewControllers = [

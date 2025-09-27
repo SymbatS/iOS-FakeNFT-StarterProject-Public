@@ -47,9 +47,18 @@ final class CartService {
             }
         }
     }
+    
     func updateNfts(orderId: String,nfts:[String],  completion: @escaping ((Result<CartResponse, Error>) -> Void)){
         let dto = CartUpdateDto(nfts: nfts)
-        let request = CartDeleteRequest(dto: dto, orderId: orderId)
+        let request = CartUpdateRequest(dto: dto, orderId: orderId)
+        networkClient.send(request: request, type: CartResponse.self) { result in
+            completion(result)
+        }
+    }
+    
+    func cartClear(completion: @escaping ((Result<CartResponse, Error>) -> Void)){
+        let dto = CartClearDto()
+        let request = CartUpdateRequest(dto: dto, orderId: "1")
         networkClient.send(request: request, type: CartResponse.self) { result in
             completion(result)
         }

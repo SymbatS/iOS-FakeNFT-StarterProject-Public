@@ -11,7 +11,7 @@ struct CartRequest: NetworkRequest {
     var httpMethod: HttpMethod { .get }
 }
 
-struct CartDeleteRequest: NetworkRequest {
+struct CartUpdateRequest: NetworkRequest {
     var dto: (any Dto)?
      
     

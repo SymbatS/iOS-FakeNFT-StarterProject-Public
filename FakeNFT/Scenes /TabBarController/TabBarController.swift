@@ -1,6 +1,7 @@
 import UIKit
 
 final class TabBarController: UITabBarController {
+
     private enum TabBarItem: Int {
         case profile
         case catalog
@@ -58,8 +59,11 @@ final class TabBarController: UITabBarController {
         let catalogService = CatalogServiceImpl(client: networkClient)
         let catalogVC = CatalogViewController(catalogService: catalogService)
         
-        let profileVC = ProfileViewController()
-        let basketVC = CartViewController(
+        let profileService = servicesAssembly.profileService
+        let profileVC = ProfileViewController(
+            servicesAssembly: servicesAssembly,
+            profileService: profileService
+        )        let basketVC = CartViewController(
             servicesAssembly: servicesAssembly,
             cartService: servicesAssembly.cartService
         )

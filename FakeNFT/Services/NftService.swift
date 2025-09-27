@@ -1,5 +1,6 @@
 import Foundation
 
+
 typealias NftCompletion = (Result<Nft, Error>) -> Void
 typealias NftsCompletion = (Result<[Nft], Error>) -> Void
 
@@ -19,6 +20,7 @@ final class NftServiceImpl: NftService {
     }
     
     func loadNft(id: String, completion: @escaping NftCompletion) {
+
         if let nft = storage.getNft(with: id) {
             completion(.success(nft))
             return

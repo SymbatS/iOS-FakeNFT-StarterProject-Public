@@ -6,5 +6,38 @@
 "Error.repeat" = "Повторить";
 "Error.Payment" = "Произошла ошибка оплаты";
 "Error.title" = "Ошибка";
+
+"Tab.profile" = "Профиль";
+"ViewProfile.MyNFT" = "Мои NFT";
+"ViewProfile.Favorites" = "Избранные NFT";
+
+"Edit.avatar" = "Ссылка на фото";
+"Edit.name" = "Имя";
+"Edit.description" = "Описания";
+"Edit.website" = "Сайт";
+"Edit.save" = "Сохранить";
+"Edit.changePhotoAction" = "Изменить фото";
+"Edit.deletePhotoAction" = "Удалить фото";
+"Edit.photoLink" = "Ссылка на фото";
+"Edit.changePhotoTitle" = "Фото профиля";
+
+
+"Common.save" = "Сохранить";
+"Common.cancel" = "Отменить";
+
+
+"MyNftViewController.emptyLabel" = "У Вас ещё нет NFT";
+"MyNftViewController.title" = "Мои NFT";
+"MyNftViewController.sortMenuTitle" = "Сортировка";
+"MyNftViewController.sortMenuName" = "По названию";
+"MyNftViewController.sortMenuPrice" = "По цене";
+"MyNftViewController.sortMenuRating" = "По рейтингу";
+"MyNftViewController.sortMenuCancel" = "Закрыть";
+"MyNftViewController.cellPrice" = "Цена";
+"MyNftViewController.by" = "От";
+
+"FavoritesViewController.title" = "Избранные NFT";
+"FavoritesViewController.placeholder" = "У вас еще нет избранных NFT";
+=======
 "cart.ready" = "К оплате";
 

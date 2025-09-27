@@ -8,10 +8,12 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
     private var nfts: [Nft] = []
     
     private let service: NftService
+    private let collectionService: CollectionService
     
-    init(category: Category, service: NftService) {
+    init(category: Category, service: NftService, collectionService: CollectionService) {
         self.category = category
         self.service = service
+        self.collectionService = collectionService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -224,6 +226,15 @@ extension CollectionViewController: NFTCollectionViewCellDelegate {
         guard let indexPath = nftCollectionView.indexPath(for: cell) else { return }
         nfts[indexPath.item] = nft
         print("NFT \(nft.title) in basket: \(nft.isInBasket)")
+        collectionService.updateCart(nft: [nft.id], orderId: "1"){ result in
+            switch result{
+            case .success(_):
+                print("Successfully updated cart")
+            case .failure(let error):
+                print("Error updating cart: \(error)")
+            }
+            
+        }
     }
 }
 

@@ -26,4 +26,29 @@ final class CollectionService: CollectionServiceProtocol {
             }
         }
     }
+    
+    func updateCart(nft: [String], orderId: String, completion: @escaping (Result<CartResponse, Error>) -> Void) {
+        let request = CartRequest(orderId: orderId)
+        
+        client.send(request: request, type: CartResponse.self) { [weak self] result in
+            switch result {
+            case .success(let cartResponse):
+                var nfts: [String] = nft
+                nfts.append(contentsOf: cartResponse.nfts)
+                print(nfts)
+                self?.updateNfts(orderId:"1",nfts:nfts, completion: completion)
+            case .failure(let error):
+                completion(.failure(error))
+            }
+        }
+    }
+    
+   private func updateNfts(orderId: String,nfts:[String],  completion: @escaping ((Result<CartResponse, Error>) -> Void)){
+        let dto = CartUpdateDto(nfts: nfts)
+        let request = CartDeleteRequest(dto: dto, orderId: orderId)
+        client.send(request: request, type: CartResponse.self) { result in
+            completion(result)
+            print(result)
+        }
+    }
 }

@@ -233,8 +233,9 @@ extension CatalogViewController: UITableViewDelegate {
         let storage = NftStorageImpl()
         let nftService = NftServiceImpl(networkClient: DefaultNetworkClient(), storage: storage)
         let collectionService = CollectionService(client: DefaultNetworkClient())
+        let profileService = ProfileService(networkClient: DefaultNetworkClient(), profileId: "1")
         
-        let vc = CollectionViewController(category: category, service: nftService, collectionService: collectionService)
+        let vc = CollectionViewController(category: category, service: nftService, collectionService: collectionService, profileService: profileService)
         vc.hidesBottomBarWhenPushed = true
         
         navigationController?.pushViewController(vc, animated: true)

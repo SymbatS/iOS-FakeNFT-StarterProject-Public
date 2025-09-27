@@ -10,7 +10,7 @@ final class PaymentService{
         networkClient.send(request: request, type: PaymentModel.self){ result in
             switch result {
             case .success(let payment):
-                CartService(networkClient: self.networkClient).updateNfts(orderId: "1", nfts: []){ result in
+                CartService(networkClient: self.networkClient).cartClear(){ result in
                     switch result {
                     case .success(_):
                         print("Successfull payment")

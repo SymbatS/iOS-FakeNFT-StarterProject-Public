@@ -184,9 +184,8 @@ extension CurrencyViewContreller: UICollectionViewDelegate {
 }
 
 extension CurrencyViewContreller: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        
-        let vc = WebViewController(url: URL)
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange) -> Bool {
+        let vc = WebViewController(urlString: URL.absoluteString)
         navigationController?.pushViewController(vc, animated: true)
         return false
     }

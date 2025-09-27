@@ -2,7 +2,7 @@ import UIKit
 import WebKit
 
 final class WebViewController: UIViewController {
-    
+
     private let urlString: String
     
     private lazy var webView: WKWebView = {
@@ -22,14 +22,13 @@ final class WebViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        title = "Пользовательское соглашение"
         setupView()
         loadRequest()
     }
     
     private func setupView() {
         view.addSubview(webView)
-        
         NSLayoutConstraint.activate([
             webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -40,7 +39,6 @@ final class WebViewController: UIViewController {
     
     private func loadRequest() {
         guard let url = URL(string: urlString) else { return }
-        let request = URLRequest(url: url)
-        webView.load(request)
+        webView.load(URLRequest(url: url))
     }
 }

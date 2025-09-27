@@ -89,7 +89,7 @@ final class NftHandler: LoadingView {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let nft):
-                    self.nfts.append(nft.toDomain())
+                    self.nfts.append(nft)
                 case .failure(let error):
                     print("Failed to load NFT with id \(id):", error)
                 }
@@ -153,4 +153,3 @@ extension NftHandler {
         return (nfts[index], index)
     }
 }
-

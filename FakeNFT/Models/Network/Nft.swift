@@ -33,13 +33,7 @@ struct NftDTO: Decodable {
             rating: Double(rating),
             price: price,
             description: description,
-            author: authorName,  // Человекочитаемое имя автора
-        Nft(
-            id: id,
-            title: name,
-            imagesUrl: images.compactMap { URL(string: $0) },
-            rating: Double(rating),
-            price: price,
+            author: authorName,
             isFavorite: false,
             isInBasket: false
         )

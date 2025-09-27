@@ -120,7 +120,7 @@ final class MyNftViewController: UIViewController, NftView {
     }
     
     private func setupSortButton() {
-        guard let sortImage = UIImage(systemName: "line.horizontal.3.decrease") else { return }
+        let sortImage = UIImage(resource: .sort)
         let sortButton = UIBarButtonItem(
             image: sortImage,
             style: .plain,
@@ -221,4 +221,3 @@ extension MyNftViewController: UITableViewDelegate {
         return 140
     }
 }
-

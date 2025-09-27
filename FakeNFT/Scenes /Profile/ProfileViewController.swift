@@ -225,6 +225,7 @@ extension ProfileViewController: ProfileInteractionDelegate {
                     completion?(updatedProfile)
                     
                 case .failure(let error):
+                    print("❌ Failed to update likes: \(error)")
                     self.profile?.likes = previousLikes
                     self.profileCardView.configure(with: self.profile!)
                     self.tableView.reloadData()

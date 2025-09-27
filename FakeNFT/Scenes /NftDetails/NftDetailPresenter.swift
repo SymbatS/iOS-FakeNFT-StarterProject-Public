@@ -61,7 +61,7 @@ final class NftDetailPresenterImpl: NftDetailPresenter {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let nft):
-                    self?.state = .data(nft.toDomain())
+                    self?.state = .data(nft)
                 case .failure(let error):
                     self?.state = .failed(error)
                 }

@@ -235,7 +235,6 @@ extension FavoritesNftViewController: UICollectionViewDelegateFlowLayout {
                         layout collectionViewLayout: UICollectionViewLayout,
                         sizeForItemAt indexPath: IndexPath) -> CGSize {
         
-        let spacing = LayoutConstants.spacingL
         let inset = LayoutConstants.horizontalPadding
         let numberOfColumns = 2
         

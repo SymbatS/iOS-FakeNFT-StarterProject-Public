@@ -63,7 +63,8 @@ final class TabBarController: UITabBarController {
         let profileVC = ProfileViewController(
             servicesAssembly: servicesAssembly,
             profileService: profileService
-        )        let basketVC = CartViewController(
+        )
+        let basketVC = CartViewController(
             servicesAssembly: servicesAssembly,
             cartService: servicesAssembly.cartService
         )

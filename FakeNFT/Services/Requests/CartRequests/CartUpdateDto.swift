@@ -8,4 +8,8 @@ struct CartUpdateDto: Dto {
         ]
     }
 }
-
+struct CartClearDto: Dto {
+    func asDictionary() -> [String : String] {
+        return ["":""]
+    }
+}

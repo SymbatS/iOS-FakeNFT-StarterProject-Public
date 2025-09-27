@@ -9,11 +9,13 @@ final class CollectionViewController: UIViewController, UICollectionViewDataSour
     
     private let service: NftService
     private let collectionService: CollectionService
+    private let profileSerivce: ProfileService
     
-    init(category: Category, service: NftService, collectionService: CollectionService) {
+    init(category: Category, service: NftService, collectionService: CollectionService,profileService: ProfileService) {
         self.category = category
         self.service = service
         self.collectionService = collectionService
+        self.profileSerivce = profileService
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -220,6 +222,25 @@ extension CollectionViewController: NFTCollectionViewCellDelegate {
         guard let indexPath = nftCollectionView.indexPath(for: cell) else { return }
         nfts[indexPath.item] = nft
         print("NFT \(nft.title) favorite: \(nft.isFavorite)")
+        var likes:[String] = [nft.id]
+        profileSerivce.fetchProfile(){ [weak self] result in
+            guard let self = self else { return }
+            switch result{
+            case .success(let profile):
+                likes.append(contentsOf: profile.likes)
+                self.profileSerivce.updateProfile(name: profile.name, avatar: profile.avatar, description: profile.description, website: profile.website, likes: likes){ result in
+                    switch result {
+                    case .success(_):
+                        print("Successfully updated likes")
+                    case .failure(let error):
+                        print("Error updating likes:\(error)")
+                    }
+                }
+            case .failure(let error):
+                print("Error fetching profile\(error)")
+            }
+            
+        }
     }
     
     func nftCell(_ cell: NFTCollectionViewCell, didToggleBasket nft: Nft) {

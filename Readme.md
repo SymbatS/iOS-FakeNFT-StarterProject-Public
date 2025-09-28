@@ -1,6 +1,8 @@
 ## СКРИНКАСТ ПРИЛОЖЕНИЯ
-https://drive.google.com/file/d/1J3DrGpODN3kAPNQDb90jw1FCdcFoP4pi/view?usp=sharing
-
+- Общий: https://drive.google.com/file/d/1J3DrGpODN3kAPNQDb90jw1FCdcFoP4pi/view?usp=sharing
+- Корзина: https://drive.google.com/file/d/1MCaVaDv4pcs7Xbuj2o09_hKwE1SRmoIN/view?usp=sharing
+- Профиль: https://drive.google.com/file/d/1joanjaGN8PszHsMscMoK1ru_vqgTe-XA/view?usp=sharing
+- Каталог: https://drive.google.com/file/d/1bvaKj95r0PmeCA_V2fK2SfByaq2_qvxf/view?usp=sharing
 # ТЗ мобильного приложения FakeNFT
 
 ## Ссылки

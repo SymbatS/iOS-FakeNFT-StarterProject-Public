@@ -1,3 +1,6 @@
+## СКРИНКАСТ ПРИЛОЖЕНИЯ
+https://drive.google.com/file/d/1J3DrGpODN3kAPNQDb90jw1FCdcFoP4pi/view?usp=sharing
+
 # ТЗ мобильного приложения FakeNFT
 
 ## Ссылки
